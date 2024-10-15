@@ -83,23 +83,16 @@ apiKeyInput.addEventListener('input', async () => {
 
 // Function to test the API key
 async function testApiKey(apiKey) {
-    const pingResponse = await pingApi(apiKey);
-    return pingResponse; // return the result of the ping check
-}
-
-// Function to ping the KOBOLD AI API
-async function pingApi(apiKey) {
     try {
-        const response = await fetch('https://api.kobold.ai/ping', {
-            method: 'GET',
+        const response = await fetch('YOUR_KOBOLD_AI_API_ENDPOINT', {
+            method: 'GET', // or POST depending on the endpoint
             headers: {
-                'X-API-KEY': apiKey // Sending the API key in the header
+                'Authorization': `Bearer ${apiKey}`
             }
         });
-        const data = await response.json();
         return response.ok; // returns true if the response status is 2xx
     } catch (error) {
-        console.error('Error pinging API:', error);
+        console.error('Error testing API key:', error);
         return false; // Return false if there's an error
     }
 }

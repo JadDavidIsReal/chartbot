@@ -9,35 +9,33 @@
 <body>
     <div class="chat-container">
         <header class="chat-header">
-            <button class="menu-btn" id="menu-btn" aria-label="Toggle menu">&#9776;</button> <!-- Hamburger button -->
+            <button class="menu-btn" id="menu-btn">&#9776;</button> <!-- Hamburger button -->
             Chart's Chatbot (WIP)
         </header>
 
         <div class="side-menu" id="side-menu">
-            <a href="#" class="close-btn" id="close-btn" aria-label="Close menu">&times;</a>
-            <a href="#" aria-label="Open API and Settings">API and Settings</a>
-            <a href="#" aria-label="Open other options">Idk</a>
-            <a href="HAMBURGER/Credits.html" aria-label="View credits">Credits</a>
+            <a href="#" class="close-btn" id="close-btn">&times;</a>
+            <a href="#">API and Settings</a>
+            <a href="#">Idk</a>
+            <a href="HAMBURGER/Credits.html">Credits</a>
         </div>
 
         <div class="chat-box" id="chat-box"></div>
         <div class="input-container">
             <textarea id="user-input" placeholder="Type a message..."></textarea>
-            <button id="send-btn" aria-label="Send message">Send</button>
+            <button id="send-btn">Send</button>
         </div>  
     </div>
-
-    <div class="right-slider" id="right-slider">
-        <a href="#" class="close-btn" id="close-right-btn" aria-label="Close API settings">&times;</a>
-        <h2>API and Settings</h2>
-        <p>Configuration options will be available here.</p>
-        <h2>Enter Chatbot API here:</h2>
-        <label for="api-key">API Key:</label>
-        <input type="text" id="api-key" placeholder="Enter your API Key here" aria-label="API Key input"/>
-        <span id="api-status" class="status-dot"></span> <!-- Status indicator -->
-        <button id="save-api-key" aria-label="Save API key">Save</button>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
+<div class="right-slider" id="right-slider">
+    <a href="#" class="close-btn" id="close-right-btn">&times;</a>
+    <h2>API and Settings</h2>
+    <p>Configuration options will be available here.</p>
+    <h2>Enter Chatbot API here:</h2>
+    <label for="api-key">API Key:</label>
+    <input type="text" id="api-key" placeholder="Enter your API Key here"/>
+    <button id="save-api-key" color: white;>Save</button>
+</div>
+</div>
