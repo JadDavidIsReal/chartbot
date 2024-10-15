@@ -37,8 +37,8 @@ body {
     display: flex;
     align-items: center;
     padding: 10px;
-    border-radius: 15px; /* No rounded corners */
-    background-color: #f3f3f3; /* Red background */
+    border-radius: 15px;
+    background-color: #f3f3f3;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     position: fixed; /* Fix position to the bottom */
     bottom: 0;
@@ -60,12 +60,14 @@ body {
     font-family: inherit;
 }
 
+
 /* Placeholder text style */
 #user-input::placeholder {
     font-family: inherit;
     color: #999; /* Light gray color for the placeholder */
     opacity: 1; /* Ensure full opacity */
 }
+
 
 #send-btn {
     padding: 0 15px; /* Remove vertical padding to match height */
@@ -182,4 +184,29 @@ body {
     left: 25px; /* Space from the left edge */
     font-size: 36px;
     color: white; /* Color for the close button */
+}
+
+
+#api-key {
+    width: calc(20% - 20px); /* Half the width minus padding */
+    padding: 5px;
+    border-radius: 15px;
+    border: 1px solid #ccc; /* Light border */
+    margin: 10px 0; /* Margin for spacing */
+
+}
+
+/* Style for the save button */
+#save-api-key {
+    width: 5%;
+    padding: 5px;
+    border-radius: 15px;
+    border: none;
+    background-color: #54ca00; /* Same as header color */
+    color: white;
+    cursor: pointer;
+}
+
+#save-api-key:hover {
+    background-color: #07a30e; /* Darker shade on hover */
 }

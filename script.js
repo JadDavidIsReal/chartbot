@@ -72,3 +72,10 @@ document.getElementById('close-right-btn').addEventListener('click', function() 
     const rightSlider = document.getElementById('right-slider');
     rightSlider.style.width = '0'; // Close the right slider
 });
+
+document.getElementById('save-api-key').addEventListener('click', function() {
+    const apiKey = document.getElementById('api-key').value;
+    // Add your logic to save the API key, e.g., to local storage or sending it to your backend
+    localStorage.setItem('apiKey', apiKey);
+    alert('API Key saved successfully!');
+});
