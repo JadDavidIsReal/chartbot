@@ -7,41 +7,92 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
             background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .header {
+            position: fixed; /* Fixed position */
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            width: 100%;
+            background-color: #54f02e;
+            color: white;
+            padding: 10px 0;
+            border-radius: 0 0 16px 16px; /* Rounded corners at the bottom */
+            z-index: 1000; /* Ensure it's above other content */
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 600px;
+            margin: 80px auto 0; /* Add top margin to avoid content being hidden under the fixed header */
         }
         h1 {
-            color: #333;
+            margin: 0; /* Remove margin from header */
         }
         h2 {
             color: #555;
+            margin-top: 20px;
         }
         ul {
             list-style-type: none;
             padding: 0;
+            margin: 10px 0;
         }
         li {
-            margin: 5px 0;
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+        strong {
+            color: #00f449;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #a4ff24; /* Button color */
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #00540b;
         }
     </style>
 </head>
 <body>
 
-    <h1>Credits</h1>
-    <h2>Project Contributors</h2>
-    <ul>
-        <li><strong>Chart</strong> - For Everything</li>
-    </ul>
+    <div class="header">
+        <h1>Credits</h1>
+    </div>
 
-    <h2>Special Thanks</h2>
-    <ul>
-        <li>Kobold - For API. (Not yet implemented)</li>
-        <li>TBD - For TTS API. (TBD)</li>
-        <li>TBD - For NLP API. (TBD)</li>
-        <li>GitHub - For Hosting the site.</li>
-        <li>Facebook Messenger - For Reference.</li>
-        <li>Myself - For thinking of this.</li>
-    </ul>
+    <div class="container">
+        <h2>Project Contributors</h2>
+        <ul>
+            <li><strong>Chart</strong> - For Everything</li>
+        </ul>
+
+        <h2>Special Thanks</h2>
+        <ul>
+            <li><strong>Kobold</strong> - For API. (Not yet implemented)</li>
+            <li><strong>TBD</strong> - For TTS API.</li>
+            <li><strong>TBD</strong> - For NLP API.</li>
+            <li><strong>GitHub</strong> - For Hosting the site.</li>
+            <li><strong>Facebook Messenger</strong> - For Reference.</li>
+            <li><strong>Myself</strong> - For thinking of this.</li>
+        </ul>
+
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Chat</button>
+    </div>
 
 </body>
 </html>
