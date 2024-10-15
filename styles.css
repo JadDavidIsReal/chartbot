@@ -35,14 +35,18 @@ body {
     display: flex;
     align-items: center;
     padding: 10px;
+    border-radius: 30px; /* Rounded corners */
+    background-color: #f0f0f0; /* Light gray background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 #user-input {
     flex: 1;
     padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    outline: none;
+    border: none; /* No border for a cleaner look */
+    border-radius: 30px; /* Match the container's radius */
+    background-color: white; /* White background for input */
+    outline: none; /* Remove outline */
     resize: none; /* Prevent manual resizing */
     height: 50px; /* Fixed height for textarea */
     margin-right: 10px; /* Space between textarea and button */
@@ -50,15 +54,15 @@ body {
 
 #send-btn {
     padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007BFF;
+    border: none; /* No border */
+    border-radius: 30px; /* Rounded corners */
+    background-color: #007BFF; /* Button color */
     color: white;
     cursor: pointer;
 }
 
 #send-btn:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker shade on hover */
 }
 
 /* Message styles */
