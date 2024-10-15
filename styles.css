@@ -9,7 +9,21 @@ body {
     height: 100vh; /* Full height of the viewport */
 }
 
+
+.chat-header {
+    background-color: #ffffff; /* Background color for the header */
+    color: rgb(0, 0, 0); /* Text color */
+    padding: 10px; /* Padding for spacing */
+    text-align: center; /* Center the header text */
+    position: fixed; /* Fix position at the top */
+    top: 0; /* Align to the top */
+    left: 0; /* Align to the left */
+    width: 100%; /* Full width */
+    z-index: 10; /* Ensure it stays above other elements */
+}
+
 .chat-container {
+    margin-top: 50px; /* Add margin to avoid overlap with the fixed header */
     width: 100%; /* Full width of the viewport */
     height: 100%; /* Full height of the viewport */
     border: none; /* Remove border */
@@ -68,7 +82,7 @@ button:hover {
 .user-message {
     text-align: left;
     margin: 5px 0;
-    background-color: #d1e7dd; /* User message color */
+    background-color: #2ede8f; /* User message color */
     border-radius: 15px;
     padding: 5px 10px; /* Reduced padding to minimize unnecessary space */
     max-width: 80%; /* Ensures messages don't exceed 80% of the chat width */
