@@ -30,7 +30,7 @@ function sendMessage() {
 
         // Simulated AI response
         setTimeout(() => {
-            const aiResponse = "I'm the receiver, but let me echo what you just said: " + message; // Simple echo response
+            const aiResponse = "TBD AI response, WIP: " + message; // Simple echo response
             appendMessage(aiResponse, 'ai'); // Append AI message
         }, 1000);
     }
