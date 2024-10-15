@@ -164,3 +164,25 @@ body {
 .side-menu a:hover {
     background-color: #5d5d5d;
 }
+.right-slider {
+    height: 100%; /* Full height */
+    width: 0; /* Start closed */
+    position: fixed; /* Stay in place */
+    z-index: 2; /* Sit on top */
+    top: 0;
+    right: 0; /* Align to the right */
+    background-color: rgba(65, 95, 26, 0.7); /* Transparent black background */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    transition: width 0.5s ease; /* Smooth transition */
+    padding-top: 60px; /* Space for header */
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.7); /* Shadow effect on the left */
+}
+
+.right-slider .close-btn {
+    position: absolute;
+    top: 0;
+    left: 25px; /* Space from the left edge */
+    font-size: 36px;
+    color: white; /* Color for the close button */
+}
+
