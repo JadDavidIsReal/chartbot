@@ -66,22 +66,26 @@ button:hover {
 }
 
 .user-message {
-    text-align: left; /* Align text to the left */
-    margin: 5px 0; /* Margin around message */
+    text-align: left;
+    margin: 5px 0;
     background-color: #d1e7dd; /* User message color */
-    border-radius: 15px; /* Rounded corners */
-    padding: 10px; /* Padding inside message */
-    max-width: 80%; /* Max width of message */
+    border-radius: 15px;
+    padding: 5px 10px; /* Reduced padding to minimize unnecessary space */
+    max-width: 80%; /* Ensures messages don't exceed 80% of the chat width */
+    width: fit-content; /* Makes the width fit the content */
+    align-self: flex-start; /* Aligns user messages to the left */
 }
 
 .ai-message {
-    text-align: right; /* Align text to the right */
-    margin: 5px 0; /* Margin around message */
+    text-align: right; /* Ensures text is aligned to the right */
+    margin: 5px 0;
     background-color: #e2e3e5; /* AI message color */
-    border-radius: 15px; /* Rounded corners */
-    padding: 10px; /* Padding inside message */
-    max-width: 80%; /* Max width of message */
-    align-self: flex-end; /* Align to the right */
+    border-radius: 15px;
+    padding: 5px 10px; /* Reduced padding to minimize unnecessary space */
+    max-width: 80%; /* Ensures messages don't exceed 80% of the chat width */
+    width: fit-content; /* Makes the width fit the content */
+    align-self: flex-end; /* Aligns AI messages to the right */
+    margin-left: auto; /* Ensures that the message hugs the right side */
 }
 
 /* Media Queries */
