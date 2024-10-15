@@ -10,6 +10,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative; /* Ensure positioning context */
 }
 
 .chat-header {
@@ -27,40 +28,49 @@ body {
 
 .chat-box {
     flex: 1;
-    padding: 60px 10px 10px; /* Adjust for header */
+    padding: 60px 10px 60px; /* Adjust for header and input container */
     overflow-y: auto;
+    margin-bottom: 60px; /* Ensure there’s space for the input area */
 }
 
 .input-container {
     display: flex;
     align-items: center;
     padding: 10px;
-    border-radius: 30px; /* Rounded corners */
-    background-color: #f0f0f0; /* Light gray background */
+    border-radius: 15px; /* No rounded corners */
+    background-color: #f3f3f3; /* Red background */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    position: fixed; /* Fix position to the bottom */
+    bottom: 0;
+    left: 50%; /* Position the left edge at 50% of the viewport */
+    transform: translateX(-50%); /* Shift left by 50% of its width to center it */
+    width: 100%;
+
 }
 
 #user-input {
     flex: 1;
     padding: 10px;
-    border: none; /* No border for a cleaner look */
-    border-radius: 30px; /* Match the container's radius */
+    border: none;
+    border-radius: 30px;
     background-color: white; /* White background for input */
-    outline: none; /* Remove outline */
+    outline: none;
     resize: none; /* Prevent manual resizing */
-    height: 50px; /* Fixed height for textarea */
-    margin-right: 10px; /* Space between textarea and button */
+    height: 20px;
+    margin-right: 10px;
+    font-family: inherit;
 }
 
 /* Placeholder text style */
 #user-input::placeholder {
-    font-family: Arial, sans-serif; /* Match the body font */
+    font-family: inherit;
     color: #999; /* Light gray color for the placeholder */
     opacity: 1; /* Ensure full opacity */
 }
 
 #send-btn {
-    padding: 10px 15px;
+    padding: 0 15px; /* Remove vertical padding to match height */
+    height: 35px; /* Set fixed height for both input and button */
     border: none; /* No border */
     border-radius: 30px; /* Rounded corners */
     background-color: #007BFF; /* Button color */
