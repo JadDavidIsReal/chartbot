@@ -14,7 +14,7 @@ body {
 }
 
 .chat-header {
-    background-color: #007BFF;
+    background-color: #54ca00;
     color: white;
     padding: 10px;
     text-align: center;
@@ -73,13 +73,13 @@ body {
     height: 35px; /* Set fixed height for both input and button */
     border: none; /* No border */
     border-radius: 30px; /* Rounded corners */
-    background-color: #007BFF; /* Button color */
+    background-color: #00ff9d; /* Button color */
     color: white;
     cursor: pointer;
 }
 
 #send-btn:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+    background-color: #07a30e; /* Darker shade on hover */
 }
 
 /* Message styles */
@@ -92,7 +92,7 @@ body {
 }
 
 .user-message {
-    background-color: #2ede8f;
+    background-color: #28b634;
     align-self: flex-start; /* Align to the left */
 }
 
