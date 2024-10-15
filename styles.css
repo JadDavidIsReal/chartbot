@@ -77,3 +77,30 @@ button:hover {
     max-width: 80%;
     align-self: flex-end; /* Aligns the AI messages to the right */
 }
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .chat-container {
+        width: 100%; /* Full width on mobile devices */
+        height: 100%; /* Full height on mobile devices */
+        border-radius: 0; /* Remove rounded corners */
+    }
+
+    .user-message, .ai-message {
+        max-width: 90%; /* Make messages wider on mobile */
+    }
+
+    input[type="text"], button {
+        padding: 8px; /* Adjust padding for smaller screens */
+    }
+
+    button {
+        width: 30%; /* Smaller button width on mobile */
+    }
+}
+
+@media (min-width: 769px) {
+    .chat-container {
+        width: 500px; /* Wider width on larger devices */
+    }
+}
