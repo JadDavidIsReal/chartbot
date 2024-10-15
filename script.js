@@ -38,7 +38,7 @@ function sendMessage() {
 
 function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
-    newMessage.textContent = message;
+    newMessage.innerHTML = message.replace(/\n/g, '<br>'); // Handle line breaks
 
     // Assign class based on sender
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
