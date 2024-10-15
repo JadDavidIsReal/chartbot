@@ -1,46 +1,42 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
 }
 
 .chat-container {
     width: 400px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    max-width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-box {
-    height: 300px;
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     padding: 10px;
     overflow-y: auto;
-    border-bottom: 1px solid #ccc;
+    max-height: 300px;
 }
 
-.chat-box .message {
+.user-message {
+    text-align: left; /* Align user messages to the left */
+    background-color: #d1e7dd; /* Light green for user messages */
+    border-radius: 5px;
+    padding: 10px;
     margin: 5px 0;
 }
 
-.chat-box .user {
-    text-align: right;
-    color: blue;
-}
-
-.chat-box .bot {
-    text-align: left;
-    color: green;
-}
-
-input[type="text"] {
-    width: calc(100% - 50px);
+.ai-message {
+    text-align: right; /* Align AI messages to the right */
+    background-color: #f8d7da; /* Light red for AI messages */
+    border-radius: 5px;
     padding: 10px;
-}
-
-button {
-    padding: 10px;
+    margin: 5px 0;
 }
