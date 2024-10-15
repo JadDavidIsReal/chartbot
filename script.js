@@ -44,3 +44,15 @@ function appendMessage(message, sender) {
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
 }
+
+// Toggle side menu with the hamburger button
+document.getElementById('menu-btn').addEventListener('click', function() {
+    const sideMenu = document.getElementById('side-menu');
+    
+    // Check if the side menu is open
+    if (sideMenu.style.width === '250px') {
+        sideMenu.style.width = '0'; // Close the menu
+    } else {
+        sideMenu.style.width = '250px'; // Open the menu
+    }
+});

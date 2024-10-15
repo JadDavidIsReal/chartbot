@@ -16,7 +16,7 @@ body {
 .chat-header {
     background-color: #54ca00;
     color: white;
-    padding: 10px;
+    padding: 20px;
     text-align: center;
     position: fixed;
     top: 0;
@@ -112,4 +112,55 @@ body {
     .user-message, .ai-message {
         max-width: 90%; /* Wider messages on mobile */
     }
+}
+
+
+/* Hamburger menu button */
+.menu-btn {
+    font-size: 30px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+/* Side menu */
+#side-menu {
+    height: 100%; /* Full height */
+    width: 0; /* Start closed */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    top: 0;
+    left: 0;
+    background-color: rgba(65, 95, 26, 0.7); /* Transparent black background */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    transition: 0.5s; /* Smooth transition */
+    padding-top: 60px; /* Space for header */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.7); /* Shadow effect on the right */
+}
+
+/* Side menu links */
+.side-menu a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+}
+
+/* Change the color of links on hover */
+.side-menu a:hover {
+    background-color: #5d5d5d;
 }
