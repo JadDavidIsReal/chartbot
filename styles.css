@@ -45,7 +45,6 @@ body {
     left: 50%; /* Position the left edge at 50% of the viewport */
     transform: translateX(-50%); /* Shift left by 50% of its width to center it */
     width: 100%;
-
 }
 
 #user-input {
@@ -114,7 +113,6 @@ body {
     }
 }
 
-
 /* Hamburger menu button */
 .menu-btn {
     font-size: 30px;
@@ -137,7 +135,7 @@ body {
     left: 0;
     background-color: rgba(65, 95, 26, 0.7); /* Transparent black background */
     overflow-x: hidden; /* Disable horizontal scroll */
-    transition: 0.5s; /* Smooth transition */
+    transition: width 0.5s; /* Smooth transition */
     padding-top: 60px; /* Space for header */
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.7); /* Shadow effect on the right */
 }
@@ -164,6 +162,7 @@ body {
 .side-menu a:hover {
     background-color: #5d5d5d;
 }
+
 .right-slider {
     height: 100%; /* Full height */
     width: 0; /* Start closed */
@@ -171,11 +170,10 @@ body {
     z-index: 2; /* Sit on top */
     top: 0;
     right: 0; /* Align to the right */
-    background-color: rgba(65, 95, 26, 0.7); /* Transparent black background */
+    background-color: rgba(44, 63, 18, 0.485); /* Transparent black background */
     overflow-x: hidden; /* Disable horizontal scroll */
     transition: width 0.5s ease; /* Smooth transition */
     padding-top: 60px; /* Space for header */
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.7); /* Shadow effect on the left */
 }
 
 .right-slider .close-btn {
@@ -185,4 +183,3 @@ body {
     font-size: 36px;
     color: white; /* Color for the close button */
 }
-

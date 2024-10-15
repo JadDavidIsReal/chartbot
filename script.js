@@ -60,14 +60,14 @@ document.getElementById('menu-btn').addEventListener('click', function() {
 // Toggle right slider on "API and Settings" click
 document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() {
     const rightSlider = document.getElementById('right-slider');
-    if (rightSlider.style.width === '300px') {
+    if (rightSlider.style.width === 'calc(100% - 250px)') {
         rightSlider.style.width = '0'; // Close the right slider if it's open
     } else {
-        rightSlider.style.width = '300px'; // Open the right slider
+        rightSlider.style.width = 'calc(100% - 250px)'; // Open the right slider to touch the left slider
     }
 });
 
-// Close the right slider when the close button is clicked
+// Close right slider on close button click
 document.getElementById('close-right-btn').addEventListener('click', function() {
     const rightSlider = document.getElementById('right-slider');
     rightSlider.style.width = '0'; // Close the right slider
