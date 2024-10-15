@@ -3,127 +3,92 @@ body {
     background-color: #f0f0f0;
     margin: 0;
     padding: 0;
-    display: flex; /* Keep centering for any additional elements */
-    justify-content: center; /* Center elements horizontally */
-    align-items: center; /* Center elements vertically */
-    height: 100vh; /* Full height of the viewport */
-}
-
-
-.chat-header {
-    background-color: #ffffff; /* Background color for the header */
-    color: rgb(0, 0, 0); /* Text color */
-    padding: 10px; /* Padding for spacing */
-    text-align: center; /* Center the header text */
-    position: fixed; /* Fix position at the top */
-    top: 0; /* Align to the top */
-    left: 0; /* Align to the left */
-    width: 100%; /* Full width */
-    z-index: 10; /* Ensure it stays above other elements */
 }
 
 .chat-container {
-    margin-top: 50px; /* Add margin to avoid overlap with the fixed header */
-    width: 100%; /* Full width of the viewport */
-    height: 100%; /* Full height of the viewport */
-    border: none; /* Remove border */
-    border-radius: 0; /* No rounded corners */
-    box-shadow: none; /* Remove box shadow */
-    background-color: white; /* Background color */
-    display: flex; /* Use flexbox layout */
-    flex-direction: column; /* Stack children vertically */
-    position: fixed; /* Fixed position */
-    top: 0; /* Align to the top */
-    left: 0; /* Align to the left */
-    overflow: hidden; /* Prevent overflow */
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    border-bottom: 1px solid #ccc;
 }
 
 .chat-box {
-    flex: 1; /* Take remaining space */
-    padding: 10px; /* Padding inside chat box */
-    overflow-y: auto; /* Enable scrolling */
-    border: none; /* No border */
+    flex: 1;
+    padding: 60px 10px 10px; /* Adjust for header */
+    overflow-y: auto;
 }
 
 .input-container {
-    display: flex; /* Use flexbox for input and button */
-    align-items: center; /* Center items vertically */
-    padding: 10px; /* Padding around the input area */
+    display: flex;
+    align-items: center;
+    padding: 10px;
 }
 
-input[type="text"] {
-    flex: 1; /* Take available space */
-    padding: 10px; /* Padding for the input */
-    border-radius: 50px; /* Circular effect */
-    border: 1px solid #ccc; /* Light border */
-    outline: none; /* Remove outline */
-    transition: border-color 0.3s; /* Transition effect */
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+    resize: none; /* Prevent manual resizing */
+    height: 50px; /* Fixed height for textarea */
+    margin-right: 10px; /* Space between textarea and button */
 }
 
-input[type="text"]:focus {
-    border-color: #007BFF; /* Change border color on focus */
+#send-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
 }
 
-button {
-    margin-left: 10px; /* Space between input and button */
-    padding: 10px 15px; /* Padding for button */
-    border: none; /* Remove border */
-    border-radius: 50px; /* Circular effect */
-    background-color: #007BFF; /* Button color */
-    color: white; /* Text color */
-    cursor: pointer; /* Pointer cursor */
-    transition: background-color 0.3s; /* Transition effect */
+#send-btn:hover {
+    background-color: #0056b3;
 }
 
-button:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+/* Message styles */
+.user-message, .ai-message {
+    max-width: 80%;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin: 5px 0;
+    width: fit-content; /* Makes the width fit the content */
 }
 
 .user-message {
-    text-align: left;
-    margin: 5px 0;
-    background-color: #2ede8f; /* User message color */
-    border-radius: 15px;
-    padding: 5px 10px; /* Reduced padding to minimize unnecessary space */
-    max-width: 80%; /* Ensures messages don't exceed 80% of the chat width */
-    width: fit-content; /* Makes the width fit the content */
-    align-self: flex-start; /* Aligns user messages to the left */
+    background-color: #2ede8f;
+    align-self: flex-start; /* Align to the left */
 }
 
 .ai-message {
-    text-align: right; /* Ensures text is aligned to the right */
-    margin: 5px 0;
-    background-color: #e2e3e5; /* AI message color */
-    border-radius: 15px;
-    padding: 5px 10px; /* Reduced padding to minimize unnecessary space */
-    max-width: 80%; /* Ensures messages don't exceed 80% of the chat width */
-    width: fit-content; /* Makes the width fit the content */
-    align-self: flex-end; /* Aligns AI messages to the right */
-    margin-left: auto; /* Ensures that the message hugs the right side */
+    background-color: #e2e3e5;
+    align-self: flex-end; /* Align to the right */
+    margin-left: auto; /* Aligns to the right */
 }
 
 /* Media Queries */
 @media (max-width: 768px) {
     .chat-container {
-        width: 100%; /* Full width on mobile devices */
-        height: 100%; /* Full height on mobile devices */
+        width: 100%;
+        height: 100%;
     }
 
     .user-message, .ai-message {
         max-width: 90%; /* Wider messages on mobile */
-    }
-
-    input[type="text"], button {
-        padding: 8px; /* Adjust padding for smaller screens */
-    }
-
-    button {
-        width: 30%; /* Smaller button width on mobile */
-    }
-}
-
-@media (min-width: 769px) {
-    .chat-container {
-        width: 100%; /* Full width on larger devices */
     }
 }
