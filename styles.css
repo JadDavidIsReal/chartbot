@@ -52,6 +52,13 @@ body {
     margin-right: 10px; /* Space between textarea and button */
 }
 
+/* Placeholder text style */
+#user-input::placeholder {
+    font-family: Arial, sans-serif; /* Match the body font */
+    color: #999; /* Light gray color for the placeholder */
+    opacity: 1; /* Ensure full opacity */
+}
+
 #send-btn {
     padding: 10px 15px;
     border: none; /* No border */
