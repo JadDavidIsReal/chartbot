@@ -13,7 +13,7 @@ document.getElementById('send-btn').addEventListener('click', function() {
 
     // Simulated AI response
     setTimeout(() => {
-        const aiResponse = "I'm the prototype receiver, but let me echo what you just said: " + message; // Simple echo response
+        const aiResponse = "I'm the receiver, but let me echo what you just said: " + message; // Simple echo response
         appendMessage(aiResponse, 'ai'); // Append AI message
     }, 1000);
 });
