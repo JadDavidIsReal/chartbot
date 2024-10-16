@@ -2,7 +2,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-const apiStatus = document.getElementById('api-status');
+const apiStatus = document.getElementById('api-status'); // Ensure this element exists
 
 // Send message on button click
 document.getElementById('send-btn').addEventListener('click', function() {
@@ -29,10 +29,9 @@ async function sendMessage() {
         userInput.value = ''; // Clear input
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
 
-        // Send the message to OpenAI API
-        const apiKey = localStorage.getItem('apiKey'); // Get the API key from local storage
+        const apiKey = apiKeyInput.value.trim(); // Get the API key from input
         if (!apiKey) {
-            appendMessage("Error: API key is missing. Please save your OpenAI API key in settings.", 'ai');
+            appendMessage("Error: API key is missing. Please enter your OpenAI API key in settings.", 'ai');
             return;
         }
 
@@ -96,11 +95,15 @@ document.getElementById('close-right-btn').addEventListener('click', function() 
     rightSlider.style.width = '0'; // Close the right slider
 });
 
-// Save API key to local storage
-document.getElementById('save-api-key').addEventListener('click', function() {
+// Apply API key (changed from saving it) to be used directly
+document.getElementById('apply-btn').addEventListener('click', function() {
     const apiKey = apiKeyInput.value.trim();
-    localStorage.setItem('apiKey', apiKey);
-    alert('API Key saved successfully!');
+    if (!apiKey) {
+        alert('Please enter a valid API Key.');
+        return;
+    }
+    alert('API Key applied successfully!');
+    // You might want to perform some validation or further actions here if needed
 });
 
 // Listen for changes in the API key input
@@ -132,5 +135,6 @@ async function testApiKey(apiKey) {
 
 // Function to update the API status indicator
 function updateApiStatus(isValid) {
-    apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Set color based on validity
+    const statusDot = document.querySelector('.status-dot'); // Ensure this matches your HTML
+    statusDot.style.backgroundColor = isValid ? 'green' : 'red'; // Set color based on validity
 }

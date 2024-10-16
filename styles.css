@@ -60,14 +60,12 @@ body {
     font-family: inherit;
 }
 
-
 /* Placeholder text style */
 #user-input::placeholder {
     font-family: inherit;
     color: #999; /* Light gray color for the placeholder */
     opacity: 1; /* Ensure full opacity */
 }
-
 
 #send-btn {
     padding: 0 15px; /* Remove vertical padding to match height */
@@ -186,18 +184,16 @@ body {
     color: white; /* Color for the close button */
 }
 
-
 #api-key {
     width: calc(20% - 20px); /* Half the width minus padding */
     padding: 5px;
     border-radius: 15px;
     border: 1px solid #ccc; /* Light border */
     margin: 10px 0; /* Margin for spacing */
-
 }
 
-/* Style for the save button */
-#save-api-key {
+/* Style for the apply button */
+#apply-btn { /* Updated ID */
     width: 5%;
     padding: 5px;
     border-radius: 15px;
@@ -207,7 +203,7 @@ body {
     cursor: pointer;
 }
 
-#save-api-key:hover {
+#apply-btn:hover { /* Updated ID */
     background-color: #07a30e; /* Darker shade on hover */
 }
 
