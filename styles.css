@@ -211,3 +211,11 @@ body {
     background-color: #07a30e; /* Darker shade on hover */
 }
 
+.status-dot {
+    display: inline-block;
+    width: 10px;  /* Width of the dot */
+    height: 10px; /* Height of the dot */
+    border-radius: 50%; /* Make it circular */
+    margin-left: 10px; /* Spacing between input and dot */
+    background-color: transparent; /* Start transparent */
+}

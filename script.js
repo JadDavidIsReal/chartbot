@@ -21,7 +21,7 @@ userInput.addEventListener('keydown', function(event) {
 });
 
 // Function to send message
-function sendMessage() {
+async function sendMessage() {
     const message = userInput.value.trim(); // Get the trimmed input
 
     if (message) {
@@ -29,12 +29,45 @@ function sendMessage() {
         userInput.value = ''; // Clear input
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
 
-        // Simulated AI response
-        setTimeout(() => {
-            const aiResponse = "Echo response sa.. Wala pakoy API: " + message; // Simple echo response
+        // Send the message to OpenAI API
+        const apiKey = localStorage.getItem('apiKey'); // Get the API key from local storage
+        if (!apiKey) {
+            appendMessage("Error: API key is missing. Please save your OpenAI API key in settings.", 'ai');
+            return;
+        }
+
+        try {
+            const aiResponse = await fetchOpenAIResponse(message, apiKey);
             appendMessage(aiResponse, 'ai'); // Append AI message
-        }, 1000);
+        } catch (error) {
+            console.error('Error fetching OpenAI response:', error);
+            appendMessage('Error fetching response from OpenAI API.', 'ai');
+        }
     }
+}
+
+// Function to fetch response from OpenAI API
+async function fetchOpenAIResponse(message, apiKey) {
+    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: message }],
+            max_tokens: 150
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
 }
 
 // Function to append messages
@@ -81,11 +114,11 @@ apiKeyInput.addEventListener('input', async () => {
     }
 });
 
-// Function to test the API key
+// Function to test the API key with OpenAI
 async function testApiKey(apiKey) {
     try {
-        const response = await fetch('YOUR_KOBOLD_AI_API_ENDPOINT', {
-            method: 'GET', // or POST depending on the endpoint
+        const response = await fetch('https://api.openai.com/v1/models', {
+            method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
             }
