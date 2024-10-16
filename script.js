@@ -3,6 +3,7 @@ const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
 const apiStatus = document.getElementById('api-status'); // Ensure this element exists
+const applyApiKeyButton = document.getElementById('apply-btn'); // Reference to the apply button
 
 // Send message on button click
 document.getElementById('send-btn').addEventListener('click', function() {
@@ -96,7 +97,7 @@ document.getElementById('close-right-btn').addEventListener('click', function() 
 });
 
 // Apply API key (changed from saving it) to be used directly
-document.getElementById('apply-btn').addEventListener('click', function() {
+applyApiKeyButton.addEventListener('click', function() {
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
         alert('Please enter a valid API Key.');
@@ -112,8 +113,10 @@ apiKeyInput.addEventListener('input', async () => {
     if (apiKey) {
         const isValid = await testApiKey(apiKey);
         updateApiStatus(isValid);
+        applyApiKeyButton.disabled = !isValid; // Enable or disable the button based on API key validity
     } else {
         apiStatus.style.backgroundColor = 'transparent'; // Reset if input is empty
+        applyApiKeyButton.disabled = true; // Disable button if input is empty
     }
 });
 
