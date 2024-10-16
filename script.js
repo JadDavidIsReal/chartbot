@@ -41,7 +41,7 @@ async function sendMessage() {
             appendMessage(aiResponse, 'ai'); // Append AI message
         } catch (error) {
             console.error('Error fetching OpenAI response:', error);
-            appendMessage('Error fetching response from OpenAI API.', 'ai');
+            appendMessage('Error fetching response from OpenAI API: ' + error.message, 'ai');
         }
     }
 }
@@ -63,7 +63,8 @@ async function fetchOpenAIResponse(message, apiKey) {
     });
 
     if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        const errorData = await response.json(); // Get error details
+        throw new Error(`API request failed: ${response.status} - ${errorData.error.message}`); // Include status and error message
     }
 
     const data = await response.json();
