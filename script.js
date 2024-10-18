@@ -4,6 +4,7 @@ const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
 const apiStatus = document.getElementById('api-status'); // Ensure this element exists
 const applyApiKeyButton = document.getElementById('apply-btn'); // Reference to the apply button
+const modelList = document.getElementById('model-list'); // Reference to the model list
 
 // Send message on button click
 document.getElementById('send-btn').addEventListener('click', function() {
@@ -56,7 +57,7 @@ async function fetchOpenAIResponse(message, apiKey) {
             'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-3.5-turbo', // You can change this dynamically if needed
             messages: [{ role: 'user', content: message }],
             max_tokens: 150
         })
@@ -105,8 +106,36 @@ applyApiKeyButton.addEventListener('click', function() {
         return;
     }
     alert('API Key applied successfully!');
-    // You might want to perform some validation or further actions here if needed
+    fetchAndDisplayModels(apiKey); // Fetch models after applying the key
 });
+
+// Function to fetch and display available models
+async function fetchAndDisplayModels(apiKey) {
+    try {
+        const response = await fetch('https://api.openai.com/v1/models', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to fetch models: ${errorData.error.message}`);
+        }
+
+        const data = await response.json();
+        modelList.innerHTML = ''; // Clear previous models
+        data.data.forEach(model => {
+            const listItem = document.createElement('li');
+            listItem.textContent = model.id; // Display model ID
+            modelList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Error fetching models:', error);
+        alert('Error fetching models: ' + error.message);
+    }
+}
 
 // Listen for changes in the API key input
 apiKeyInput.addEventListener('input', async () => {
@@ -139,6 +168,5 @@ async function testApiKey(apiKey) {
 
 // Function to update the API status indicator
 function updateApiStatus(isValid) {
-    const statusDot = document.querySelector('.status-dot'); // Ensure this matches your HTML
-    statusDot.style.backgroundColor = isValid ? 'green' : 'red'; // Set color based on validity
+    apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Set status color based on validity
 }
