@@ -31,34 +31,28 @@ async function sendMessage() {
     userInput.value = ''; // Clear input
     chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
 
-    const apiKey = apiKeyInput.value.trim(); // Get the API key from input
-    if (!apiKey) {
-        appendMessage("Error: API key is missing. Please enter your OpenAI API key in settings.", 'ai');
-        return;
-    }
-
     try {
-        const aiResponse = await fetchOpenAIResponse(message, apiKey);
+        const aiResponse = await fetchKoboldAIResponse(message);
         appendMessage(aiResponse, 'ai'); // Append AI message
     } catch (error) {
-        console.error('Error fetching OpenAI response:', error);
-        appendMessage('Error fetching response from OpenAI API: ' + error.message, 'ai');
+        console.error('Error fetching Kobold AI response:', error);
+        appendMessage('Error fetching response from Kobold AI: ' + error.message, 'ai');
     }
 }
 
-// Function to fetch response from OpenAI API
-async function fetchOpenAIResponse(message, apiKey) {
-    const endpoint = 'https://api.openai.com/v1/chat/completions';
+// Function to fetch response from Kobold AI (local or hosted)
+async function fetchKoboldAIResponse(message) {
+    const endpoint = 'https://aihorde.net/api/v1/'; // Adjust to match your Kobold AI setup
     const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: modelSelect.value, // Use selected model from the dropdown
-            messages: [{ role: 'user', content: message }],
-            max_tokens: 150
+            prompt: message, // Kobold AI expects a 'prompt' field
+            max_length: 150, // Adjust length
+            temperature: 0.7, // Adjust to desired creativity level
+            stop_sequence: ["\n"] // Adjust stop sequence if needed
         })
     });
 
@@ -68,7 +62,7 @@ async function fetchOpenAIResponse(message, apiKey) {
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.text; // Kobold AI returns text, adjust as per API response
 }
 
 // Function to append messages
@@ -105,19 +99,13 @@ applyApiKeyButton.addEventListener('click', async function() {
         return;
     }
     alert('API Key applied successfully!');
-    await fetchAndDisplayModels(apiKey); // Fetch models after applying the key
+    await fetchAndDisplayKoboldModels(); // Fetch models after applying the key
 });
 
-// Function to fetch and display available models
-async function fetchAndDisplayModels(apiKey) {
+// Function to fetch and display available Koboldcpp Horde models
+async function fetchAndDisplayKoboldModels() {
     try {
-        const response = await fetch('https://api.openai.com/v1/models', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`
-            }
-        });
-
+        const response = await fetch('http://localhost:5001/api/v1/model'); // Replace with the actual Kobold Horde API
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(`Failed to fetch models: ${errorData.error.message}`);
@@ -125,50 +113,24 @@ async function fetchAndDisplayModels(apiKey) {
 
         const data = await response.json();
         modelSelect.innerHTML = ''; // Clear previous models
-        data.data.forEach(model => {
+        data.models.forEach(model => {
             const option = document.createElement('option');
             option.value = model.id; // Set value of dropdown option
-            option.textContent = model.id; // Display model ID
+            option.textContent = model.name; // Display model name
             modelSelect.appendChild(option); // Append option to dropdown
         });
     } catch (error) {
-        console.error('Error fetching models:', error);
+        console.error('Error fetching Kobold models:', error);
         alert('Error fetching models: ' + error.message);
     }
 }
 
-// Listen for changes in the API key input
+// Listen for changes in the API key input (Optional if using API key with Kobold AI)
 apiKeyInput.addEventListener('input', async () => {
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
-        const isValid = await testApiKey(apiKey);
-        updateApiStatus(isValid);
-        applyApiKeyButton.disabled = !isValid; // Enable or disable the button based on API key validity
-        if (isValid) {
-            await fetchAndDisplayModels(apiKey); // Fetch models if API key is valid
-        }
+        applyApiKeyButton.disabled = false;
     } else {
-        apiStatus.style.backgroundColor = 'transparent'; // Reset if input is empty
-        applyApiKeyButton.disabled = true; // Disable button if input is empty
+        applyApiKeyButton.disabled = true;
     }
 });
-
-// Function to test the API key with OpenAI
-async function testApiKey(apiKey) {
-    try {
-        const response = await fetch('https://api.openai.com/v1/models', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`
-            }
-        });
-        return response.ok; // Return true if response is ok
-    } catch {
-        return false; // Return false if there's an error
-    }
-}
-
-// Function to update the API key status
-function updateApiStatus(isValid) {
-    apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Change status color based on validity
-}
