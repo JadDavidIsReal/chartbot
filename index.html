@@ -32,21 +32,18 @@
         <h2>API and Settings</h2>
         <p>Configuration options will be available here.</p>
         <h2>Enter Chatbot API Key:</h2>
+        <h2 style="margin-bottom: 5px;">Provide and Choose API:</h2>
         <label for="api-key">API Key:</label>
         <input type="text" id="api-key" placeholder="Enter your API Key here"/>
-<<<<<<< HEAD
-        <span id="api-status" class="status-dot"></span> <!-- Status indicator -->
-        <button id="apply-btn">Apply</button> <!-- Correct ID -->
-
-        <h2>Available Models:</h2>
-        <ul id="model-list"></ul> <!-- List to display available models -->
-=======
         <span id="api-status" class="status-dot"></span>
         <button id="apply-btn">Apply</button>
     
         <h2>Available Models:</h2>
         <select id="model-select"></select> <!-- Only the dropdown for models -->
->>>>>>> parent of d58a9a9 (OPEN AI ALPHA 1)
+        <div class="model-selection">
+            <p style="margin: 0;">Available Models:</p>
+            <select id="model-select" style="display: inline-block; margin-left: 10px;"></select> <!-- Dropdown for models -->
+        </div>
     </div>
 
     <script src="script.js"></script>

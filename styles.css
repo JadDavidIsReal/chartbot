@@ -1,3 +1,4 @@
+@ -1,217 +1,231 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -190,6 +191,7 @@ body {
     border-radius: 15px;
     border: 1px solid #ccc; /* Light border */
     margin: 10px 0; /* Margin for spacing */
+    margin: 10px 0 5px; /* Adjusted margin for better spacing */
 }
 
 /* Style for the apply button */
@@ -205,13 +207,44 @@ body {
 
 #apply-btn:hover { /* Updated ID */
     background-color: #07a30e; /* Darker shade on hover */
+#apply-btn {
+    width: 10%; /* Changed to 10% for much shorter width */
+    padding: 10px; /* Padding for button */
+    border: none; /* No border */
+    border-radius: 15px; /* Rounded corners */
+    background-color: #28b634; /* Button color */
+    color: white; /* Button text color */
+    cursor: pointer; /* Pointer on hover */
+    margin-top: 10px; /* Margin above the button */
 }
 
+/* Style for the status dot */
 .status-dot {
     display: inline-block;
     width: 10px;  /* Width of the dot */
+    display: inline-block; /* Inline display */
+    width: 10px; /* Width of the dot */
     height: 10px; /* Height of the dot */
     border-radius: 50%; /* Make it circular */
     margin-left: 10px; /* Spacing between input and dot */
     background-color: transparent; /* Start transparent */
+    border-radius: 50%; /* Circular shape */
+    background-color: red; /* Red by default */
+    margin-left: 5px; /* Space to the left */
+}
+
+/* Flexbox styles for dropdown */
+.flex-container {
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: flex-start; /* Align items to the left */
+    margin-top: 10px; /* Space above the dropdown */
+}
+
+#model-dropdown {
+    width: 200px; /* Fixed width for dropdown */
+    padding: 5px; /* Padding for dropdown */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #ccc; /* Light border */
+    margin-left: 10px; /* Space between text and dropdown */
 }
