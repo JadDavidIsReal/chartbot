@@ -83,7 +83,12 @@ function appendMessage(message, sender) {
 document.getElementById('menu-btn').addEventListener('click', function() {
     const sideMenu = document.getElementById('side-menu');
     sideMenu.style.width = sideMenu.style.width === '250px' ? '0' : '250px'; // Toggle menu
+    
+    // Close the right slider when the hamburger button is clicked again
+    const rightSlider = document.getElementById('right-slider');
+    rightSlider.style.width = '0';
 });
+
 
 // Toggle right slider on "API and Settings" click
 document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() {
