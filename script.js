@@ -6,8 +6,15 @@ const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select'); // Reference to the model dropdown
 
+
+
+
 // Send message on button click
 document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+
+
+
 
 // Listen for keydown events in the input field
 userInput.addEventListener('keydown', (event) => {
@@ -21,6 +28,9 @@ userInput.addEventListener('keydown', (event) => {
     }
 });
 
+
+
+
 // Function to send message
 async function sendMessage() {
     const message = userInput.value.trim(); // Get the trimmed input
@@ -33,7 +43,7 @@ async function sendMessage() {
 
     const apiKey = apiKeyInput.value.trim(); // Get the API key from input
     if (!apiKey) {
-        appendMessage("Error: API key is missing. Please enter your OpenAI API key in settings.", 'ai');
+        appendMessage("Error: API key is missing. Please enter your OpenAI or Meta API key in settings.", 'ai');
         return;
     }
 
@@ -45,6 +55,13 @@ async function sendMessage() {
         appendMessage('Error fetching response from OpenAI API: ' + error.message, 'ai');
     }
 }
+
+
+
+
+
+
+
 
 // Function to fetch response from OpenAI API
 async function fetchOpenAIResponse(message, apiKey) {
@@ -70,13 +87,30 @@ async function fetchOpenAIResponse(message, apiKey) {
     const data = await response.json();
     return data.choices[0].message.content;
 }
+// Function to fetch response from Meta AI
+async function fetchMetaResponse(message, apiKey) {
+    const endpoint = 'https://api.meta.com/v1/';
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: 'llama',
+            prompt: message,
+            max_tokens: 100,
+            temperature: 1.0
+        })
+    });
 
-// Function to append messages
-function appendMessage(message, sender) {
-    const newMessage = document.createElement('div');
-    newMessage.innerHTML = message.replace(/\n/g, '<br>'); // Handle line breaks
-    newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
-    chatBox.appendChild(newMessage);
+    if (!response.ok) {
+        const errorData = await response.json(); // Get error details
+        throw new Error(`API request failed: ${response.status} - ${errorData.error.message}`); // Include status and error message
+    }
+
+    const data = await response.json();
+    return data.generated_text;
 }
 
 // Toggle side menu with the hamburger button
@@ -88,7 +122,6 @@ document.getElementById('menu-btn').addEventListener('click', function() {
     const rightSlider = document.getElementById('right-slider');
     rightSlider.style.width = '0';
 });
-
 
 // Toggle right slider on "API and Settings" click
 document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() {
@@ -103,7 +136,7 @@ document.getElementById('close-right-btn').addEventListener('click', function() 
 });
 
 // Apply API key
-applyApiKeyButton.addEventListener('click', async function() {
+document.getElementById('apply-btn').addEventListener('click', async function() {
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
         alert('Please enter a valid API Key.');
@@ -113,28 +146,50 @@ applyApiKeyButton.addEventListener('click', async function() {
     await fetchAndDisplayModels(apiKey); // Fetch models after applying the key
 });
 
-// Function to fetch and display available models
+// Function to fetch and display available models from OpenAI and Meta
 async function fetchAndDisplayModels(apiKey) {
     try {
-        const response = await fetch('https://api.openai.com/v1/models', {
+        // Fetch models from OpenAI
+        const openAIResponse = await fetch('https://api.openai.com/v1/models', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+        
+        if (!openAIResponse.ok) {
+            const errorData = await openAIResponse.json();
+            throw new Error(`Failed to fetch OpenAI models: ${errorData.error.message}`);
+        }
+
+        const openAIData = await openAIResponse.json();
+        modelSelect.innerHTML = ''; // Clear previous models
+        openAIData.data.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = `OpenAI: ${model.id}`;
+            modelSelect.appendChild(option);
+        });
+
+        // Fetch models from Meta
+        const metaResponse = await fetch('https://api.meta.com/v1/models', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
             }
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Failed to fetch models: ${errorData.error.message}`);
+        if (!metaResponse.ok) {
+            const errorData = await metaResponse.json();
+            throw new Error(`Failed to fetch Meta models: ${errorData.error.message}`);
         }
 
-        const data = await response.json();
-        modelSelect.innerHTML = ''; // Clear previous models
-        data.data.forEach(model => {
+        const metaData = await metaResponse.json();
+        metaData.forEach(model => {
             const option = document.createElement('option');
-            option.value = model.id; // Set value of dropdown option
-            option.textContent = model.id; // Display model ID
-            modelSelect.appendChild(option); // Append option to dropdown
+            option.value = model.id;
+            option.textContent = `Meta: ${model.name} (${model.id})`;
+            modelSelect.appendChild(option);
         });
     } catch (error) {
         console.error('Error fetching models:', error);
@@ -142,26 +197,60 @@ async function fetchAndDisplayModels(apiKey) {
     }
 }
 
+// Handle query button click
+document.getElementById('query-btn').addEventListener('click', async () => {
+    const modelId = modelSelect.value;
+    const prompt = prompt('Enter your query: ');
+
+    try {
+        const response = await fetch('https://api.meta.com/v1/queries', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKeyInput.value.trim()}`,
+            },
+            body: JSON.stringify({
+                model: modelId,
+                prompt: prompt,
+                max_tokens: 100,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to query model: ${errorData.error.message}`);
+        }
+
+        const data = await response.json();
+        const responseContainer = document.getElementById('response-container');
+        responseContainer.innerText = data.response;
+    } catch (error) {
+        console.error('Error querying model:', error);
+        alert('Error querying model: ' + error.message);
+    }
+});
+
 // Listen for changes in the API key input
 apiKeyInput.addEventListener('input', async () => {
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
         const isValid = await testApiKey(apiKey);
         updateApiStatus(isValid);
-        applyApiKeyButton.disabled = !isValid; // Enable or disable the button based on API key validity
+        document.getElementById('apply-btn').disabled = !isValid; // Enable or disable the button based on API key validity
         if (isValid) {
             await fetchAndDisplayModels(apiKey); // Fetch models if API key is valid
         }
     } else {
         apiStatus.style.backgroundColor = 'transparent'; // Reset if input is empty
-        applyApiKeyButton.disabled = true; // Disable button if input is empty
+        document.getElementById('apply-btn').disabled = true; // Disable button if input is empty
     }
 });
 
 // Function to test the API key with OpenAI
-async function testApiKey(apiKey) {
+async function testApiKey(apiKey, isMeta = false) {
     try {
-        const response = await fetch('https://api.openai.com/v1/models', {
+        const url = isMeta ? 'https://api.meta.com/v1/models' : 'https://api.openai.com/v1/models';
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
@@ -177,3 +266,4 @@ async function testApiKey(apiKey) {
 function updateApiStatus(isValid) {
     apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Change status color based on validity
 }
+
