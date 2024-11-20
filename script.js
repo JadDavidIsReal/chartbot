@@ -123,6 +123,7 @@ document.getElementById('menu-btn').addEventListener('click', function() {
     rightSlider.style.width = '0';
 });
 
+
 // Toggle right slider on "API and Settings" click
 document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() {
     const rightSlider = document.getElementById('right-slider');
@@ -266,4 +267,5 @@ async function testApiKey(apiKey, isMeta = false) {
 function updateApiStatus(isValid) {
     apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Change status color based on validity
 }
+
 
