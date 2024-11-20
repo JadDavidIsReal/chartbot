@@ -1,22 +1,31 @@
-// Get a reference to the chat box and input elements
+//1. HTML REFERENCES:
+
+// Reference to the chat box element, displays chat messages
 const chatBox = document.getElementById('chat-box');
+// Reference to the text input field for user messages
 const userInput = document.getElementById('user-input');
+// Field for entering the OpenAI API key
 const apiKeyInput = document.getElementById('api-key');
+// A visual indicator for the validity of the API key
 const apiStatus = document.getElementById('api-status');
+// Button to apply the API key
 const applyApiKeyButton = document.getElementById('apply-btn');
-const modelSelect = document.getElementById('model-select'); // Reference to the model dropdown
+// Dropdown to select the AI model
+const modelSelect = document.getElementById('model-select');
 
 
 
 
-// Send message on button click
+
+//2. Send message on button click
 document.getElementById('send-btn').addEventListener('click', sendMessage);
+//event listener to the "Send" button. Calls "sendMessage" function when clicked.
 
 
+// Listens for keyboard events in the input field.
+//Shift + Enter: Inserts a newline.
+//Enter: Sends the message by calling sendMessage.
 
-
-
-// Listen for keydown events in the input field
 userInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         if (event.shiftKey) {
@@ -31,51 +40,47 @@ userInput.addEventListener('keydown', (event) => {
 
 
 
-// Function to send message
+
+
+//3. Function to send message
+
 async function sendMessage() {
-    const message = userInput.value.trim(); // Get the trimmed input
-
-    if (!message) return; // Return if the message is empty
-
-    appendMessage(message, 'user'); // Append user message
-    userInput.value = ''; // Clear input
+    const message = userInput.value.trim(); // Trim user input.
+    if (!message) return; // Makes sure the user input is not empty. if it is, it dont do anything.
+    appendMessage(message, 'user'); // Append user message. Meaning puts the user input to the chat inbox.
+    userInput.value = ''; // Clear input. Basically after a send, it clears the chat box.
     chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
-
     const apiKey = apiKeyInput.value.trim(); // Get the API key from input
     if (!apiKey) {
-        appendMessage("Error: API key is missing. Please enter your OpenAI or Meta API key in settings.", 'ai');
+        appendMessage("Error: API key is missing. Please enter your OpenAI API key in settings.", 'ai');//If no API input, then, return/display this message.
         return;
     }
 
     try {
         const aiResponse = await fetchOpenAIResponse(message, apiKey);
-        appendMessage(aiResponse, 'ai'); // Append AI message
+        appendMessage(aiResponse, 'ai'); // Returns AI message response. "ai" meaning the actual AI response.
     } catch (error) {
-        console.error('Error fetching OpenAI response:', error);
-        appendMessage('Error fetching response from OpenAI API: ' + error.message, 'ai');
+        console.error('Error fetching OpenAI response:', error);// if otherwise, display these.
+        appendMessage('Error fetching response from OpenAI API: ' + error.message, 'ai');//custom text that it dont work, + AI specific message.
     }
 }
 
 
 
 
-
-
-
-
-// Function to fetch response from OpenAI API
+// 4. Function to fetch response from OpenAI API
 async function fetchOpenAIResponse(message, apiKey) {
-    const endpoint = 'https://api.openai.com/v1/chat/completions';
+    const endpoint = 'https://api.openai.com/v1/chat/completions';// THE API ENDPOINT
     const response = await fetch(endpoint, {
-        method: 'POST',
+        method: 'POST',//Calls POST: an HTTP request method that sends data to the server to update; the API
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'Authorization': `Bearer ${apiKey}`//OpenAI Syntax I believe
         },
         body: JSON.stringify({
-            model: modelSelect.value, // Use selected model from the dropdown
+            model: modelSelect.value, // Use selected model from the dropdown. Uses model-select from HTML
             messages: [{ role: 'user', content: message }],
-            max_tokens: 150
+            max_tokens: 150 //locked, OpenAI syntax input
         })
     });
 
@@ -87,47 +92,39 @@ async function fetchOpenAIResponse(message, apiKey) {
     const data = await response.json();
     return data.choices[0].message.content;
 }
-// Function to fetch response from Meta AI
-async function fetchMetaResponse(message, apiKey) {
-    const endpoint = 'https://api.meta.com/v1/';
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            model: 'llama',
-            prompt: message,
-            max_tokens: 100,
-            temperature: 1.0
-        })
-    });
 
-    if (!response.ok) {
-        const errorData = await response.json(); // Get error details
-        throw new Error(`API request failed: ${response.status} - ${errorData.error.message}`); // Include status and error message
-    }
 
-    const data = await response.json();
-    return data.generated_text;
-}
 
-// Toggle side menu with the hamburger button
-document.getElementById('menu-btn').addEventListener('click', function() {
-    const sideMenu = document.getElementById('side-menu');
-    sideMenu.style.width = sideMenu.style.width === '250px' ? '0' : '250px'; // Toggle menu
+
+
+// 5. Function to Display Messages
+
+function appendMessage(message, sender) {
+    const newMessage = document.createElement('div'); //make a user div.
+    newMessage.innerHTML = message.replace(/\n/g, '<br>'); // Handle line breaks
+    newMessage.className = sender === 'user' ? 'user-message' : 'ai-message'; // Add class based on sender
+    chatBox.appendChild(newMessage);
+} //Adds a new message to the chat box, distinguishing between user and AI messages using CSS classes.
+
+
+
+
+
+
+// 6. Toggle side menu with the hamburger button
+document.getElementById('menu-btn').addEventListener('click', function() { //Hamburger button function. Event listener when clicked.
+    const sideMenu = document.getElementById('side-menu'); //When Hamburger clicked, then side menu appears.
+    sideMenu.style.width = sideMenu.style.width === '250px' ? '0' : '250px'; // Toggle menu show/unshow left slider
     
-    // Close the right slider when the hamburger button is clicked again
+    // Close the right slider when the hamburger button is clicked again. So that clicking it again closes it.
     const rightSlider = document.getElementById('right-slider');
     rightSlider.style.width = '0';
 });
 
-
 // Toggle right slider on "API and Settings" click
-document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() {
-    const rightSlider = document.getElementById('right-slider');
-    rightSlider.style.width = rightSlider.style.width === 'calc(100% - 250px)' ? '0' : 'calc(100% - 250px)'; // Toggle slider
+document.querySelector('.side-menu a:nth-child(2)').addEventListener('click', function() { //adds event listener for the right slider.
+    const rightSlider = document.getElementById('right-slider'); //This is the right slider.
+    rightSlider.style.width = rightSlider.style.width === 'calc(100% - 250px)' ? '0' : 'calc(100% - 250px)'; // Toggle slider.
 });
 
 // Close right slider on close button click
@@ -136,61 +133,52 @@ document.getElementById('close-right-btn').addEventListener('click', function() 
     rightSlider.style.width = '0'; // Close the right slider
 });
 
-// Apply API key
-document.getElementById('apply-btn').addEventListener('click', async function() {
+
+
+
+
+
+
+// 7. Apply API key and testing
+
+applyApiKeyButton.addEventListener('click', async function() { //apply API key button event listener. Async function allows other code to run while it's waiting for a long running task.
     const apiKey = apiKeyInput.value.trim();
-    if (!apiKey) {
-        alert('Please enter a valid API Key.');
+    if (!apiKey) { //calls the API key
+        alert('Please enter a valid API Key.'); // This is the blank message that you see before entering an API key.
         return;
     }
-    alert('API Key applied successfully!');
-    await fetchAndDisplayModels(apiKey); // Fetch models after applying the key
+    alert('API Key applied successfully!'); // If correct API key applied, then this one displays.
+    await fetchAndDisplayModels(apiKey); // Fetch models after applying the key to the dropdown.
 });
 
-// Function to fetch and display available models from OpenAI and Meta
+
+
+
+
+
+// 8. Function to fetching and display available models
+
 async function fetchAndDisplayModels(apiKey) {
     try {
-        // Fetch models from OpenAI
-        const openAIResponse = await fetch('https://api.openai.com/v1/models', {
+        const response = await fetch('https://api.openai.com/v1/models', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
             }
         });
-        
-        if (!openAIResponse.ok) {
-            const errorData = await openAIResponse.json();
-            throw new Error(`Failed to fetch OpenAI models: ${errorData.error.message}`);
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Failed to fetch models: ${errorData.error.message}`);
         }
 
-        const openAIData = await openAIResponse.json();
+        const data = await response.json();
         modelSelect.innerHTML = ''; // Clear previous models
-        openAIData.data.forEach(model => {
+        data.data.forEach(model => {
             const option = document.createElement('option');
-            option.value = model.id;
-            option.textContent = `OpenAI: ${model.id}`;
-            modelSelect.appendChild(option);
-        });
-
-        // Fetch models from Meta
-        const metaResponse = await fetch('https://api.meta.com/v1/models', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`
-            }
-        });
-
-        if (!metaResponse.ok) {
-            const errorData = await metaResponse.json();
-            throw new Error(`Failed to fetch Meta models: ${errorData.error.message}`);
-        }
-
-        const metaData = await metaResponse.json();
-        metaData.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model.id;
-            option.textContent = `Meta: ${model.name} (${model.id})`;
-            modelSelect.appendChild(option);
+            option.value = model.id; // Set value of dropdown option
+            option.textContent = model.id; // Display model ID
+            modelSelect.appendChild(option); // Append option to dropdown
         });
     } catch (error) {
         console.error('Error fetching models:', error);
@@ -198,60 +186,31 @@ async function fetchAndDisplayModels(apiKey) {
     }
 }
 
-// Handle query button click
-document.getElementById('query-btn').addEventListener('click', async () => {
-    const modelId = modelSelect.value;
-    const prompt = prompt('Enter your query: ');
-
-    try {
-        const response = await fetch('https://api.meta.com/v1/queries', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKeyInput.value.trim()}`,
-            },
-            body: JSON.stringify({
-                model: modelId,
-                prompt: prompt,
-                max_tokens: 100,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Failed to query model: ${errorData.error.message}`);
-        }
-
-        const data = await response.json();
-        const responseContainer = document.getElementById('response-container');
-        responseContainer.innerText = data.response;
-    } catch (error) {
-        console.error('Error querying model:', error);
-        alert('Error querying model: ' + error.message);
-    }
-});
-
 // Listen for changes in the API key input
 apiKeyInput.addEventListener('input', async () => {
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
         const isValid = await testApiKey(apiKey);
         updateApiStatus(isValid);
-        document.getElementById('apply-btn').disabled = !isValid; // Enable or disable the button based on API key validity
+        applyApiKeyButton.disabled = !isValid; // Enable or disable the button based on API key validity
         if (isValid) {
             await fetchAndDisplayModels(apiKey); // Fetch models if API key is valid
         }
     } else {
         apiStatus.style.backgroundColor = 'transparent'; // Reset if input is empty
-        document.getElementById('apply-btn').disabled = true; // Disable button if input is empty
+        applyApiKeyButton.disabled = true; // Disable button if input is empty
     }
 });
 
-// Function to test the API key with OpenAI
-async function testApiKey(apiKey, isMeta = false) {
+
+
+
+
+// 9. Function to test the API key with OpenAI. Reason being here, is to have a separate function to test the API key explicitly. REDUNDANT FOR FRONT END. Necessary for Front-End.
+
+async function testApiKey(apiKey) { //API Key function. TEST.
     try {
-        const url = isMeta ? 'https://api.meta.com/v1/models' : 'https://api.openai.com/v1/models';
-        const response = await fetch(url, {
+        const response = await fetch('https://api.openai.com/v1/models', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
@@ -263,9 +222,11 @@ async function testApiKey(apiKey, isMeta = false) {
     }
 }
 
-// Function to update the API key status
+
+
+
+
+// 10. Function to update the API key status. For the Button.
 function updateApiStatus(isValid) {
     apiStatus.style.backgroundColor = isValid ? 'green' : 'red'; // Change status color based on validity
 }
-
-
