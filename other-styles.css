@@ -1,0 +1,99 @@
+/* Documentations styles */
+
+/* Container */
+.documentation {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header */
+  .documentation-header {
+    margin-bottom: 20px;
+  }
+  
+  .documentation-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .documentation-header p {
+    font-size: 16px;
+    color: #666;
+  }
+  
+  /* Section */
+  .documentation-section {
+    margin-bottom: 40px;
+  }
+  
+  .documentation-section h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .documentation-section p {
+    font-size: 16px;
+    color: #666;
+  }
+  
+  /* Code block */
+  .code-block {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .code-block code {
+    font-size: 14px;
+    font-family: monospace;
+  }
+  
+  /* Table */
+  .documentation-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .documentation-table th, .documentation-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .documentation-table th {
+    background-color: #f0f0f0;
+  }
+  
+  /* Links */
+  .documentation a {
+    text-decoration: none;
+    color: #337ab7;
+  }
+  
+  .documentation a:hover {
+    color: #23527c;
+  }
+
+
+  
+  .back-button {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    background-color: #a4ff24;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.back-button:hover {
+    background-color: #00540b;
+}
