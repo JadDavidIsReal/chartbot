@@ -1,84 +1,55 @@
-/* Documentations styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+    }
 
-/* Container */
-.documentation {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Header */
-  .documentation-header {
-    margin-bottom: 20px;
-  }
-  
-  .documentation-header h1 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .documentation-header p {
-    font-size: 16px;
-    color: #666;
-  }
-  
-  /* Section */
-  .documentation-section {
-    margin-bottom: 40px;
-  }
-  
-  .documentation-section h2 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .documentation-section p {
-    font-size: 16px;
-    color: #666;
-  }
-  
-  /* Code block */
-  .code-block {
-    background-color: #f0f0f0;
-    padding: 10px;
-    border: 1px solid #ddd;
-  }
-  
-  .code-block code {
-    font-size: 14px;
-    font-family: monospace;
-  }
-  
-  /* Table */
-  .documentation-table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  .documentation-table th, .documentation-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .documentation-table th {
-    background-color: #f0f0f0;
-  }
-  
-  /* Links */
-  .documentation a {
-    text-decoration: none;
-    color: #337ab7;
-  }
-  
-  .documentation a:hover {
-    color: #23527c;
-  }
+    .container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 600px;
+        margin: 80px auto 0;
+    }
+
+    h1 {
+        margin: 0;
+    }
+
+    h2 {
+        color: #555;
+        margin-top: 20px;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    li {
+        margin: 8px 0;
+        font-size: 1.1em;
+    }
+
+    strong {
+        color: #00f449;
+    }
+
+    .back-button {
+        position: fixed;
+        left: 10px;
+        top: 10px;
+        background-color: #a4ff24;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
 
   
