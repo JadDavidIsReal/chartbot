@@ -1,233 +1,212 @@
-
+/* General Body Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
     margin: 0;
-    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212;
+    color: #f4f4f9;
 }
 
 .chat-container {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
+    max-width: 800px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    position: relative; /* Ensure positioning context */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+body.dark-mode .chat-container {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 20px rgba(255,255,255,0.1);
 }
 
 .chat-header {
-    background-color: #54ca00;
+    background-color: #5a9;
     color: white;
-    padding: 20px;
-    text-align: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10;
-    border-bottom: 1px solid #ccc;
+    padding: 15px 20px;
+    font-size: 1.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+body.dark-mode .chat-header {
+    background-color: #333;
+    border-bottom: 1px solid #444;
+}
+
+.menu-btn, .dark-mode-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
 }
 
 .chat-box {
     flex: 1;
-    padding: 60px 10px 60px; /* Adjust for header and input container */
+    padding: 20px;
     overflow-y: auto;
-    margin-bottom: 60px; /* Ensure there’s space for the input area */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-message, .ai-message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 70%;
+    line-height: 1.5;
+}
+
+.user-message {
+    background-color: #5a9;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.ai-message {
+    background-color: #e5e5ea;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+body.dark-mode .ai-message {
+    background-color: #3a3a3c;
+    color: #f4f4f9;
 }
 
 .input-container {
     display: flex;
-    align-items: center;
     padding: 10px;
-    border-radius: 15px;
-    background-color: #f3f3f3;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    position: fixed; /* Fix position to the bottom */
-    bottom: 0;
-    left: 50%; /* Position the left edge at 50% of the viewport */
-    transform: translateX(-50%); /* Shift left by 50% of its width to center it */
-    width: 100%;
+    border-top: 1px solid #ddd;
+}
+
+body.dark-mode .input-container {
+    border-top: 1px solid #444;
 }
 
 #user-input {
     flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 30px;
-    background-color: white; /* White background for input */
-    outline: none;
-    resize: none; /* Prevent manual resizing */
-    height: 20px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
     margin-right: 10px;
-    font-family: inherit;
+    outline: none;
+    font-size: 1em;
 }
 
-/* Placeholder text style */
-#user-input::placeholder {
-    font-family: inherit;
-    color: #999; /* Light gray color for the placeholder */
-    opacity: 1; /* Ensure full opacity */
+body.dark-mode #user-input {
+    background-color: #3a3a3c;
+    border-color: #555;
+    color: #f4f4f9;
 }
 
 #send-btn {
-    padding: 0 15px; /* Remove vertical padding to match height */
-    height: 35px; /* Set fixed height for both input and button */
-    border: none; /* No border */
-    border-radius: 30px; /* Rounded corners */
-    background-color: #00ff9d; /* Button color */
+    background-color: #5a9;
     color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
     cursor: pointer;
+    font-size: 1em;
 }
 
 #send-btn:hover {
-    background-color: #07a30e; /* Darker shade on hover */
+    background-color: #489;
 }
 
-/* Message styles */
-.user-message, .ai-message {
-    max-width: 80%;
-    border-radius: 15px;
-    padding: 5px 10px;
-    margin: 5px 0;
-    width: fit-content; /* Makes the width fit the content */
-}
-
-.user-message {
-    background-color: #28b634;
-    align-self: flex-start; /* Align to the left */
-}
-
-.ai-message {
-    background-color: #e2e3e5;
-    align-self: flex-end; /* Align to the right */
-    margin-left: auto; /* Aligns to the right */
-}
-
-/* Media Queries */
-@media (max-width: 768px) {
-    .chat-container {
-        width: 100%;
-        height: 100%;
-    }
-
-    .user-message, .ai-message {
-        max-width: 90%; /* Wider messages on mobile */
-    }
-}
-
-/* Hamburger menu button */
-.menu-btn {
-    font-size: 30px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-}
-
-/* Side menu */
-#side-menu {
-    height: 100%; /* Full height */
-    width: 0; /* Start closed */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+/* Side Menu */
+.side-menu {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 100;
     top: 0;
     left: 0;
-    background-color: rgba(65, 95, 26, 0.7); /* Transparent black background */
-    overflow-x: hidden; /* Disable horizontal scroll */
-    transition: width 0.5s; /* Smooth transition */
-    padding-top: 60px; /* Space for header */
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.7); /* Shadow effect on the right */
+    background-color: #333;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    color: white;
 }
 
-/* Side menu links */
 .side-menu a {
-    padding: 8px 8px 8px 32px;
+    padding: 10px 15px;
     text-decoration: none;
-    font-size: 25px;
+    font-size: 1.2em;
     color: white;
     display: block;
     transition: 0.3s;
 }
 
-/* Close button */
-.close-btn {
+.side-menu a:hover {
+    background-color: #575757;
+}
+
+.side-menu .close-btn {
     position: absolute;
     top: 0;
     right: 25px;
     font-size: 36px;
+    margin-left: 50px;
 }
 
-/* Change the color of links on hover */
-.side-menu a:hover {
-    background-color: #5d5d5d;
+.side-menu h2 {
+    padding: 0 15px;
 }
 
-.right-slider {
-    height: 100%; /* Full height */
-    width: 0; /* Start closed */
-    position: fixed; /* Stay in place */
-    z-index: 2; /* Sit on top */
-    top: 0;
-    right: 0; /* Align to the right */
-    background-color: rgba(44, 63, 18, 0.485); /* Transparent black background */
-    overflow-x: hidden; /* Disable horizontal scroll */
-    transition: width 0.5s ease; /* Smooth transition */
-    padding-top: 60px; /* Space for header */
+.side-menu .setting {
+    padding: 10px 15px;
 }
 
-.right-slider .close-btn {
-    position: absolute;
-    top: 0;
-    left: 25px; /* Space from the left edge */
-    font-size: 36px;
-    color: white; /* Color for the close button */
+.side-menu label {
+    display: block;
+    margin-bottom: 5px;
 }
 
-#api-key {
-    width: calc(20% - 20px); /* Half the width minus padding */
-    padding: 5px;
-    border-radius: 15px;
-    border: 1px solid #ccc; /* Light border */
-    margin: 10px 0 5px; /* Adjusted margin for better spacing */
+.side-menu input, .side-menu select {
+    width: calc(100% - 30px);
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #444;
+    color: white;
 }
 
-/* Style for the apply button */
-#apply-btn {
-    width: 10%; /* Changed to 10% for much shorter width */
-    padding: 10px; /* Padding for button */
-    border: none; /* No border */
-    border-radius: 15px; /* Rounded corners */
-    background-color: #28b634; /* Button color */
-    color: white; /* Button text color */
-    cursor: pointer; /* Pointer on hover */
-    margin-top: 10px; /* Margin above the button */
+.side-menu button {
+    margin: 15px;
+    padding: 10px 15px;
+    width: calc(100% - 30px);
+    border-radius: 5px;
+    border: none;
+    background-color: #5a9;
+    color: white;
+    cursor: pointer;
 }
 
-/* Style for the status dot */
 .status-dot {
-    display: inline-block; /* Inline display */
-    width: 10px; /* Width of the dot */
-    height: 10px; /* Height of the dot */
-    border-radius: 50%; /* Circular shape */
-    background-color: red; /* Red by default */
-    margin-left: 5px; /* Space to the left */
+    height: 10px;
+    width: 10px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
 }
-
-/* Flexbox styles for dropdown */
-.flex-container {
-    display: flex;
-    align-items: center; /* Center vertically */
-    justify-content: flex-start; /* Align items to the left */
-    margin-top: 10px; /* Space above the dropdown */
-}
-
-#model-dropdown {
-    width: 200px; /* Fixed width for dropdown */
-    padding: 5px; /* Padding for dropdown */
-    border-radius: 5px; /* Rounded corners */
-    border: 1px solid #ccc; /* Light border */
-    margin-left: 10px; /* Space between text and dropdown */
-}
-
