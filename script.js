@@ -2,7 +2,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-apiKeyInput.value = "";
+apiKeyInput.value = " ";
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
