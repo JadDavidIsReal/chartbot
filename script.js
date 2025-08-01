@@ -9,6 +9,11 @@ const menuBtn = document.getElementById('menu-btn');
 const sideMenu = document.getElementById('side-menu');
 const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
+const micBtn = document.getElementById('mic-btn');
+
+// Gloabl variables
+let conversationHistory = [];
+let isRecording = false;
 
 // 2. EVENT LISTENERS
 
@@ -59,6 +64,8 @@ async function sendMessage() {
     if (!message) return;
 
     appendMessage(message, 'user');
+    conversationHistory.push({ role: 'user', content: message });
+
     userInput.value = '';
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -69,8 +76,15 @@ async function sendMessage() {
     }
 
     try {
-        const aiResponse = await fetchGroqResponse(message, apiKey);
+        const aiResponse = await fetchGroqResponse(apiKey);
         appendMessage(aiResponse, 'ai');
+        speak(aiResponse); // Speak the AI's response
+        conversationHistory.push({ role: 'assistant', content: aiResponse });
+
+        // Trim history to the last 3 pairs of messages (6 total)
+        if (conversationHistory.length > 6) {
+            conversationHistory = conversationHistory.slice(-6);
+        }
     } catch (error) {
         console.error('Error fetching Groq response:', error);
         appendMessage('Error fetching response from Groq API: ' + error.message, 'ai');
@@ -81,12 +95,19 @@ async function sendMessage() {
 
 /**
  * Fetches a response from the Groq API.
- * @param {string} message - The user's message.
  * @param {string} apiKey - The Groq API key.
  * @returns {Promise<string>} - The AI's response.
  */
-async function fetchGroqResponse(message, apiKey) {
+async function fetchGroqResponse(apiKey) {
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+
+    const systemPrompt = {
+        role: 'system',
+        content: "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term."
+    };
+
+    const messagesWithSystemPrompt = [systemPrompt, ...conversationHistory];
+
     const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -95,7 +116,7 @@ async function fetchGroqResponse(message, apiKey) {
         },
         body: JSON.stringify({
             model: modelSelect.value,
-            messages: [{ role: 'user', content: message }],
+            messages: messagesWithSystemPrompt,
         })
     });
 
@@ -177,4 +198,75 @@ async function testApiKey(apiKey) {
  */
 function updateApiStatus(isValid) {
     apiStatus.style.backgroundColor = isValid ? 'green' : 'red';
+}
+
+// 4. SPEECH RECOGNITION
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    micBtn.addEventListener('click', () => {
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+
+        if (isRecording) {
+            recognition.stop();
+            return;
+        }
+        userInput.value = ''; // Clear the input field
+        recognition.start();
+    });
+
+    recognition.onstart = () => {
+        isRecording = true;
+        micBtn.style.color = 'red'; // Or some other visual indicator
+        micBtn.textContent = '...'; // Change icon to show it's listening
+    };
+
+    recognition.onend = () => {
+        isRecording = false;
+        micBtn.style.color = ''; // Reset color
+        micBtn.innerHTML = '&#127908;'; // Reset icon
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+        // Automatically send the message
+        sendMessage();
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        appendMessage(`Speech recognition error: ${event.error}`, 'ai');
+    };
+
+} else {
+    micBtn.style.display = 'none';
+    console.log("Speech Recognition not supported in this browser.");
+}
+
+// 5. TEXT-TO-SPEECH (TTS)
+
+/**
+ * Speaks the given text using the browser's SpeechSynthesis API.
+ * @param {string} text - The text to be spoken.
+ */
+function speak(text) {
+    // Create a new speech utterance
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Optional: Configure voice, pitch, rate
+    // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
+    // utterance.pitch = 1;
+    // utterance.rate = 1;
+
+    // Speak the text
+    speechSynthesis.speak(utterance);
 }
