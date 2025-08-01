@@ -31,11 +31,19 @@ userInput.addEventListener('keydown', (event) => {
 
 // Toggle side menu
 menuBtn.addEventListener('click', () => {
+<<<<<<< HEAD
     sideMenu.classList.add('side-menu-open');
 });
 
 closeBtn.addEventListener('click', () => {
     sideMenu.classList.remove('side-menu-open');
+=======
+    sideMenu.style.width = '250px';
+});
+
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.width = '0';
+>>>>>>> parent of b56980c (feat: Update and order conversational models)
 });
 
 // Toggle dark mode
