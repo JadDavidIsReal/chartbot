@@ -241,8 +241,8 @@ body.dark-mode #user-input {
 
 @media (min-width: 768px) {
     .chat-container {
-        height: 90vh;
-        max-height: 720px;
-        border-radius: 15px;
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
     }
 }
