@@ -17,6 +17,7 @@ const browserTtsVolume = document.getElementById('browser-tts-volume');
 const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
+const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
 
 // Gloabl variables
 let conversationHistory = [];
@@ -58,10 +59,23 @@ function populateAiTtsVoices() {
     });
 }
 
+function populateBrowserTtsVoices() {
+    const voices = speechSynthesis.getVoices();
+    browserTtsVoiceSelect.innerHTML = '';
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        browserTtsVoiceSelect.appendChild(option);
+    });
+}
+
 // 2. EVENT LISTENERS
 
 browserTtsToggle.addEventListener('click', () => {
     browserTtsEnabled = browserTtsToggle.checked;
+    browserTtsVolume.disabled = !browserTtsEnabled;
+    browserTtsVoiceSelect.disabled = !browserTtsEnabled;
 });
 
 aiTtsToggle.addEventListener('click', () => {
@@ -349,6 +363,10 @@ if (SpeechRecognition) {
 async function speak(text) {
     if (browserTtsEnabled) {
         const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoice = speechSynthesis.getVoices().find(voice => voice.name === browserTtsVoiceSelect.value);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
         utterance.volume = browserTtsVolume.value / 100;
         utterance.onend = () => {
             if (isVoiceMode) {
@@ -413,5 +431,9 @@ document.addEventListener('DOMContentLoaded', () => {
     populateAiTtsVoices();
     aiTtsModelSelect.disabled = true;
     aiTtsVoiceSelect.disabled = true;
+
+    speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
+    browserTtsVoiceSelect.disabled = true;
+
     initializeApp();
 });
