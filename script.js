@@ -12,11 +12,7 @@ function retrieveKey() {
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-<<<<<<< HEAD
-apiKeyInput.value = "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";
-=======
 apiKeyInput.value = retrieveKey();
->>>>>>> fcca557b4e64e095cb3e1b34063dccae34db032e
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
