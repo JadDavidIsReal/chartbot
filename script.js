@@ -21,6 +21,9 @@ const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
 const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
+=======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 =======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
@@ -49,6 +52,9 @@ aiTtsToggle.addEventListener('click', () => {
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
+=======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 =======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
