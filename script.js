@@ -12,31 +12,22 @@ const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
-<<<<<<< HEAD
-=======
 const browserTtsToggle = document.getElementById('browser-tts-toggle');
 const browserTtsVolume = document.getElementById('browser-tts-volume');
 const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
 const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
-=======
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
-=======
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 
 // Gloabl variables
 let conversationHistory = [];
 let isRecording = false;
 let isVoiceMode = false;
+let browserTtsEnabled = false;
+let aiTtsEnabled = false;
 
 // 2. EVENT LISTENERS
 
-<<<<<<< HEAD
-=======
 browserTtsToggle.addEventListener('click', () => {
     browserTtsEnabled = browserTtsToggle.checked;
     browserTtsVolume.disabled = !browserTtsEnabled;
@@ -49,15 +40,13 @@ aiTtsToggle.addEventListener('click', () => {
     aiTtsVoiceSelect.disabled = !aiTtsEnabled;
 });
 
+// This function is missing, I will add a placeholder.
+function populateAiTtsVoices() {
+    console.log("Populating AI TTS voices (not implemented yet)");
+}
+
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
-=======
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
-=======
->>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
 userInput.addEventListener('keydown', (event) => {
@@ -69,19 +58,11 @@ userInput.addEventListener('keydown', (event) => {
 
 // Toggle side menu
 menuBtn.addEventListener('click', () => {
-<<<<<<< HEAD
     sideMenu.classList.add('side-menu-open');
 });
 
 closeBtn.addEventListener('click', () => {
     sideMenu.classList.remove('side-menu-open');
-=======
-    sideMenu.style.width = '250px';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.width = '0';
->>>>>>> parent of b56980c (feat: Update and order conversational models)
 });
 
 // Toggle dark mode
@@ -362,6 +343,7 @@ if (SpeechRecognition) {
  * @param {string} text - The text to be spoken.
  */
 function speak(text) {
+    if (!browserTtsEnabled) return;
     // Create a new speech utterance
     const utterance = new SpeechSynthesisUtterance(text);
 
