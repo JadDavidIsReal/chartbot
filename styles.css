@@ -251,3 +251,40 @@ body.dark-mode #user-input {
         border-radius: 0;
     }
 }
+
+/* TTS Toggle Switch */
+#tts-toggle {
+    appearance: none;
+    width: 3em;
+    height: 1.5em;
+    background-color: #ccc;
+    border-radius: 1.5em;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#tts-toggle::before {
+    content: '';
+    width: 1.2em;
+    height: 1.2em;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.15em;
+    left: 0.15em;
+    transition: transform 0.3s;
+}
+
+#tts-toggle:checked {
+    background-color: #5a9;
+}
+
+#tts-toggle:checked::before {
+    transform: translateX(1.5em);
+}
+
+#tts-voice-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
