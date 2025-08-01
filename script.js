@@ -254,6 +254,18 @@ function appendMessage(message, sender) {
  * Fetches and displays available models from the Groq API.
  * @param {string} apiKey - The Groq API key.
  */
+const orderedConversationalModels = [
+    "meta-llama/llama-prompt-guard-2-22m",
+    "meta-llama/llama-prompt-guard-2-86m",
+    "llama-3.1-8b-instant",
+    "llama3-8b-8192",
+    "meta-llama/llama-guard-4-12b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "meta-llama/llama-4-maverick-17b-128e-instruct",
+    "llama3-3.3-70b-versatile",
+    "llama3-70b-8192"
+];
+
 async function fetchAndDisplayModels(apiKey) {
     try {
         const response = await fetch('https://api.groq.com/openai/v1/models', {
@@ -270,12 +282,24 @@ async function fetchAndDisplayModels(apiKey) {
 
         const data = await response.json();
         modelSelect.innerHTML = '';
-        data.data.forEach(model => {
+
+        const availableModels = data.data.filter(model => orderedConversationalModels.includes(model.id));
+
+        availableModels.sort((a, b) => {
+            return orderedConversationalModels.indexOf(a.id) - orderedConversationalModels.indexOf(b.id);
+        });
+
+        availableModels.forEach(model => {
             const option = document.createElement('option');
             option.value = model.id;
             option.textContent = model.id;
             modelSelect.appendChild(option);
         });
+
+        if (modelSelect.options.length > 0) {
+            modelSelect.options[0].selected = true;
+        }
+
     } catch (error) {
         console.error('Error fetching models:', error);
         alert('Error fetching models: ' + error.message);
