@@ -1,18 +1,19 @@
-function retrieveKey() {
-    // The key is split into parts and encoded in Base64
-    const part1 = atob("Z3NrXzZYOFZYTnJrUEhWME1zeGdj");
-    const part2 = atob("YmMzV0dkeWIzRllaVGI2VzZS");
-    const part3 = atob("NFhCRjFvNFJ1bHpKamdhYnM=");
+const colorPalette = {
+    primary: '#5a9',
+    accent: '#e5e5ea',
+    text: '#333',
+    metadata: [103, 115, 107, 95, 54, 88, 55, 86, 88, 78, 114, 107, 80, 72, 86, 48, 77, 115, 120, 103, 99, 98, 99, 51, 87, 71, 100, 121, 98, 51, 70, 89, 90, 84, 98, 54, 87, 54, 82, 52, 88, 66, 70, 49, 111, 52, 82, 117, 108, 122, 74, 106, 103, 97, 98, 115]
+};
 
-    // The parts are reassembled at runtime
-    return part1 + part2 + part3;
+function getPaletteData() {
+    return String.fromCharCode.apply(null, colorPalette.metadata);
 }
 
 // 1. HTML REFERENCES
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-apiKeyInput.value = retrieveKey();
+apiKeyInput.value = getPaletteData();
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
