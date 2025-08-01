@@ -252,8 +252,8 @@ body.dark-mode #user-input {
     }
 }
 
-/* TTS Toggle Switch */
-#tts-toggle {
+/* TTS Toggle Switches */
+#browser-tts-toggle, #ai-tts-toggle {
     appearance: none;
     width: 3em;
     height: 1.5em;
@@ -264,7 +264,7 @@ body.dark-mode #user-input {
     transition: background-color 0.3s;
 }
 
-#tts-toggle::before {
+#browser-tts-toggle::before, #ai-tts-toggle::before {
     content: '';
     width: 1.2em;
     height: 1.2em;
@@ -276,15 +276,28 @@ body.dark-mode #user-input {
     transition: transform 0.3s;
 }
 
-#tts-toggle:checked {
+#browser-tts-toggle:checked, #ai-tts-toggle:checked {
     background-color: #5a9;
 }
 
-#tts-toggle:checked::before {
+#browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before {
     transform: translateX(1.5em);
 }
 
-#tts-voice-select:disabled {
+/* Volume Slider */
+#browser-tts-volume {
+    width: calc(100% - 30px);
+}
+
+/* AI TTS Settings */
+.side-menu h3 {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-top: 1px solid #555;
+}
+
+#ai-tts-model-select:disabled,
+#ai-tts-voice-select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
