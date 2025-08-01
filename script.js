@@ -2,7 +2,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-apiKeyInput.value = "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";
+apiKeyInput.value = "";
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
@@ -12,13 +12,91 @@ const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
+const browserTtsToggle = document.getElementById('browser-tts-toggle');
+const browserTtsVolume = document.getElementById('browser-tts-volume');
+const aiTtsToggle = document.getElementById('ai-tts-toggle');
+const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
+const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
+const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
+const unlockAiTtsBtn = document.getElementById('unlock-ai-tts-btn');
+const aiTtsSettings = document.getElementById('ai-tts-settings');
 
 // Gloabl variables
 let conversationHistory = [];
 let isRecording = false;
 let isVoiceMode = false;
+let browserTtsEnabled = false;
+let aiTtsEnabled = false;
+
+const aiTtsModels = {
+    "playai-tts": [
+        "Arista-PlayAI", "Atlas-PlayAI", "Basil-PlayAI", "Briggs-PlayAI",
+        "Calum-PlayAI", "Celeste-PlayAI", "Cheyenne-PlayAI", "Chip-PlayAI",
+        "Cillian-PlayAI", "Deedee-PlayAI", "Fritz-PlayAI", "Gail-PlayAI",
+        "Indigo-PlayAI", "Mamaw-PlayAI", "Mason-PlayAI", "Mikail-PlayAI",
+        "Mitch-PlayAI", "Quinn-PlayAI", "Thunder-PlayAI"
+    ],
+    "playai-tts-arabic": [
+        "Ahmad-PlayAI", "Amira-PlayAI", "Khalid-PlayAI", "Nasser-PlayAI"
+    ]
+};
+
+function populateAiTtsModels() {
+    for (const model in aiTtsModels) {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        aiTtsModelSelect.appendChild(option);
+    }
+}
+
+function populateAiTtsVoices() {
+    const selectedModel = aiTtsModelSelect.value;
+    aiTtsVoiceSelect.innerHTML = '';
+    aiTtsModels[selectedModel].forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice;
+        option.textContent = voice.replace('-PlayAI', '');
+        aiTtsVoiceSelect.appendChild(option);
+    });
+}
+
+function populateBrowserTtsVoices() {
+    const voices = speechSynthesis.getVoices();
+    browserTtsVoiceSelect.innerHTML = '';
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        browserTtsVoiceSelect.appendChild(option);
+    });
+}
 
 // 2. EVENT LISTENERS
+
+browserTtsToggle.addEventListener('click', () => {
+    browserTtsEnabled = browserTtsToggle.checked;
+    browserTtsVolume.disabled = !browserTtsEnabled;
+    browserTtsVoiceSelect.disabled = !browserTtsEnabled;
+});
+
+aiTtsToggle.addEventListener('click', () => {
+    aiTtsEnabled = aiTtsToggle.checked;
+    aiTtsModelSelect.disabled = !aiTtsEnabled;
+    aiTtsVoiceSelect.disabled = !aiTtsEnabled;
+});
+
+aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
+
+unlockAiTtsBtn.addEventListener('click', () => {
+    const password = prompt("Enter password to unlock AI TTS settings:");
+    if (password === "123123") {
+        aiTtsSettings.style.display = 'block';
+        unlockAiTtsBtn.style.display = 'none';
+    } else {
+        alert("Incorrect password.");
+    }
+});
 
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
@@ -32,11 +110,14 @@ userInput.addEventListener('keydown', (event) => {
 // Toggle side menu
 menuBtn.addEventListener('click', () => {
     sideMenu.style.width = '250px';
+    sideMenu.classList.add('side-menu-open');
 });
 
 closeBtn.addEventListener('click', () => {
     sideMenu.style.width = '0';
+    sideMenu.classList.remove('side-menu-open');
 });
+
 
 // Toggle dark mode
 darkModeBtn.addEventListener('click', () => {
@@ -164,7 +245,8 @@ async function fetchGroqResponse(apiKey) {
  */
 function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
-    newMessage.innerHTML = message.replace(/\n/g, '<br>');
+    newMessage.innerHTML = message.replace(/
+/g, '<br>');
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
 }
@@ -173,6 +255,7 @@ function appendMessage(message, sender) {
  * Fetches and displays available models from the Groq API.
  * @param {string} apiKey - The Groq API key.
  */
+
 const orderedConversationalModels = [
     "llama3-8b-8192",
     "llama-3.1-8b-instant",
@@ -315,24 +398,66 @@ if (SpeechRecognition) {
  * Speaks the given text using the browser's SpeechSynthesis API.
  * @param {string} text - The text to be spoken.
  */
-function speak(text) {
-    // Create a new speech utterance
-    const utterance = new SpeechSynthesisUtterance(text);
+async function speak(text) {
+    if (browserTtsEnabled) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoice = speechSynthesis.getVoices().find(voice => voice.name === browserTtsVoiceSelect.value);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+        utterance.volume = browserTtsVolume.value / 100;
+        utterance.onend = () => {
+            if (isVoiceMode) {
+                recognition.start();
+            }
+        };
+        speechSynthesis.speak(utterance);
+    } else if (aiTtsEnabled) {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            appendMessage("Error: API key is missing. Cannot use AI TTS.", 'ai');
+            return;
+        }
 
-    // When speech ends, check if we should listen again
-    utterance.onend = () => {
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: aiTtsModelSelect.value,
+                    input: text,
+                    voice: aiTtsVoiceSelect.value
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`AI TTS request failed: ${response.status} - ${errorData.error.message}`);
+            }
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+
+            audio.onended = () => {
+                if (isVoiceMode) {
+                    recognition.start();
+                }
+            };
+
+        } catch (error) {
+            console.error('Error with AI TTS:', error);
+            appendMessage('Error with AI TTS: ' + error.message, 'ai');
+        }
+    } else {
         if (isVoiceMode) {
             recognition.start();
         }
-    };
-
-    // Optional: Configure voice, pitch, rate
-    // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
-    // utterance.pitch = 1;
-    // utterance.rate = 1;
-
-    // Speak the text
-    speechSynthesis.speak(utterance);
+    }
 }
 
 // Apply saved theme on load
@@ -340,5 +465,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+    populateAiTtsModels();
+    populateAiTtsVoices();
+    aiTtsModelSelect.disabled = true;
+    aiTtsVoiceSelect.disabled = true;
+
+    speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
+    browserTtsVoiceSelect.disabled = true;
+
     initializeApp();
 });
