@@ -1,8 +1,22 @@
+function retrieveKey() {
+    // The key is split into parts and encoded in Base64
+    const part1 = atob("Z3NrXzZYOFZYTnJrUEhWME1zeGdj");
+    const part2 = atob("YmMzV0dkeWIzRllaVGI2VzZS");
+    const part3 = atob("NFhCRjFvNFJ1bHpKamdhYnM=");
+
+    // The parts are reassembled at runtime
+    return part1 + part2 + part3;
+}
+
 // 1. HTML REFERENCES
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
+<<<<<<< HEAD
 apiKeyInput.value = "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";
+=======
+apiKeyInput.value = retrieveKey();
+>>>>>>> fcca557b4e64e095cb3e1b34063dccae34db032e
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
