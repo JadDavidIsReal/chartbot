@@ -31,11 +31,11 @@ userInput.addEventListener('keydown', (event) => {
 
 // Toggle side menu
 menuBtn.addEventListener('click', () => {
-    sideMenu.style.width = '250px';
+    sideMenu.classList.add('side-menu-open');
 });
 
 closeBtn.addEventListener('click', () => {
-    sideMenu.style.width = '0';
+    sideMenu.classList.remove('side-menu-open');
 });
 
 // Toggle dark mode

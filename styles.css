@@ -178,6 +178,7 @@ body.dark-mode #user-input {
 }
 
 .side-menu.side-menu-open {
+    width: 250px;
     pointer-events: auto;
 }
 
