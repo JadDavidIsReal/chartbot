@@ -12,6 +12,15 @@ const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
+<<<<<<< HEAD
+=======
+const browserTtsToggle = document.getElementById('browser-tts-toggle');
+const browserTtsVolume = document.getElementById('browser-tts-volume');
+const aiTtsToggle = document.getElementById('ai-tts-toggle');
+const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
+const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
+const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 
 // Gloabl variables
 let conversationHistory = [];
@@ -20,6 +29,23 @@ let isVoiceMode = false;
 
 // 2. EVENT LISTENERS
 
+<<<<<<< HEAD
+=======
+browserTtsToggle.addEventListener('click', () => {
+    browserTtsEnabled = browserTtsToggle.checked;
+    browserTtsVolume.disabled = !browserTtsEnabled;
+    browserTtsVoiceSelect.disabled = !browserTtsEnabled;
+});
+
+aiTtsToggle.addEventListener('click', () => {
+    aiTtsEnabled = aiTtsToggle.checked;
+    aiTtsModelSelect.disabled = !aiTtsEnabled;
+    aiTtsVoiceSelect.disabled = !aiTtsEnabled;
+});
+
+aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
+
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
 userInput.addEventListener('keydown', (event) => {
