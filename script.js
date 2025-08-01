@@ -12,11 +12,31 @@ const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
+const ttsToggle = document.getElementById('tts-toggle');
+const ttsVoiceSelect = document.getElementById('tts-voice-select');
 
 // Gloabl variables
 let conversationHistory = [];
 let isRecording = false;
 let isVoiceMode = false;
+let ttsEnabled = false;
+
+const ttsVoices = [
+    "Arista-PlayAI", "Atlas-PlayAI", "Basil-PlayAI", "Briggs-PlayAI",
+    "Calum-PlayAI", "Celeste-PlayAI", "Cheyenne-PlayAI", "Chip-PlayAI",
+    "Cillian-PlayAI", "Deedee-PlayAI", "Fritz-PlayAI", "Gail-PlayAI",
+    "Indigo-PlayAI", "Mamaw-PlayAI", "Mason-PlayAI", "Mikail-PlayAI",
+    "Mitch-PlayAI", "Quinn-PlayAI", "Thunder-PlayAI"
+];
+
+function populateTtsVoices() {
+    ttsVoices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice;
+        option.textContent = voice.replace('-PlayAI', '');
+        ttsVoiceSelect.appendChild(option);
+    });
+}
 
 // 2. EVENT LISTENERS
 
@@ -38,6 +58,12 @@ menuBtn.addEventListener('click', () => {
 closeBtn.addEventListener('click', () => {
     sideMenu.style.width = '0';
     sideMenu.classList.remove('side-menu-open');
+});
+
+// Toggle TTS
+ttsToggle.addEventListener('click', () => {
+    ttsEnabled = ttsToggle.checked;
+    ttsVoiceSelect.disabled = !ttsEnabled;
 });
 
 // Toggle dark mode
@@ -293,24 +319,54 @@ if (SpeechRecognition) {
  * Speaks the given text using the browser's SpeechSynthesis API.
  * @param {string} text - The text to be spoken.
  */
-function speak(text) {
-    // Create a new speech utterance
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    // When speech ends, check if we should listen again
-    utterance.onend = () => {
+async function speak(text) {
+    if (!ttsEnabled) {
         if (isVoiceMode) {
             recognition.start();
         }
-    };
+        return;
+    }
 
-    // Optional: Configure voice, pitch, rate
-    // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
-    // utterance.pitch = 1;
-    // utterance.rate = 1;
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+        appendMessage("Error: API key is missing. Cannot use TTS.", 'ai');
+        return;
+    }
 
-    // Speak the text
-    speechSynthesis.speak(utterance);
+    try {
+        const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'playai-tts',
+                input: text,
+                voice: ttsVoiceSelect.value
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`TTS request failed: ${response.status} - ${errorData.error.message}`);
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.play();
+
+        audio.onended = () => {
+            if (isVoiceMode) {
+                recognition.start();
+            }
+        };
+
+    } catch (error) {
+        console.error('Error with TTS:', error);
+        appendMessage('Error with TTS: ' + error.message, 'ai');
+    }
 }
 
 // Apply saved theme on load
@@ -318,5 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+    populateTtsVoices();
+    ttsVoiceSelect.disabled = true;
     initializeApp();
 });
