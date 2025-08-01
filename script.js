@@ -18,6 +18,8 @@ const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
 const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
+const unlockAiTtsBtn = document.getElementById('unlock-ai-tts-btn');
+const aiTtsSettings = document.getElementById('ai-tts-settings');
 
 // Gloabl variables
 let conversationHistory = [];
@@ -85,6 +87,16 @@ aiTtsToggle.addEventListener('click', () => {
 });
 
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
+
+unlockAiTtsBtn.addEventListener('click', () => {
+    const password = prompt("Enter password to unlock AI TTS settings:");
+    if (password === "123123") {
+        aiTtsSettings.style.display = 'block';
+        unlockAiTtsBtn.style.display = 'none';
+    } else {
+        alert("Incorrect password.");
+    }
+});
 
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);

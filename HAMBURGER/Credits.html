@@ -4,78 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credits</title>
+    <link rel="stylesheet" href="../styles.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .header {
-            position: fixed; /* Fixed position */
-            top: 0; /* Align to top */
-            left: 0; /* Align to left */
-            width: 100%;
-            background-color: #54f02e;
-            color: white;
-            padding: 10px 0;
-            border-radius: 0 0 16px 16px; /* Rounded corners at the bottom */
-            z-index: 1000; /* Ensure it's above other content */
+            justify-content: flex-start;
         }
         .container {
-            background-color: white;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            max-width: 600px;
-            margin: 80px auto 0; /* Add top margin to avoid content being hidden under the fixed header */
-        }
-        h1 {
-            margin: 0; /* Remove margin from header */
-        }
-        h2 {
-            color: #555;
-            margin-top: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-        li {
-            margin: 8px 0;
-            font-size: 1.1em;
-        }
-        strong {
-            color: #00f449;
+            max-width: 800px;
+            margin: 20px;
+            width: 100%;
         }
         .back-button {
-            margin-top: 20px;
+            margin-bottom: 20px;
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
-            background-color: #a4ff24; /* Button color */
+            background-color: #5a9;
             color: white;
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s ease;
         }
         .back-button:hover {
-            background-color: #00540b;
+            background-color: #489;
         }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>Credits</h1>
-    </div>
-
     <div class="container">
+        <button class="back-button" onclick="window.location.href='../index.html'">Back to Chat</button>
+        <h1>Credits</h1>
         <h2>Project Contributors</h2>
         <ul>
             <li><strong>Chart</strong> - Yours, truly</li>
@@ -83,16 +45,10 @@
 
         <h2>Special Thanks</h2>
         <ul>
-            <li><strong>Kobold</strong> - For API. (Not yet implemented)</li>
-            <li><strong>OpenAI</strong> - For Operational Alternative API</li>
-            <li><strong>TBD</strong> - For TTS API.</li>
-            <li><strong>TBD</strong> - For NLP API.</li>
+            <li><strong>Groq</strong> - For the AI Chat and TTS APIs.</li>
             <li><strong>GitHub</strong> - For Hosting the site.</li>
-            <li><strong>Facebook Messenger</strong> - For Reference.</li>
+            <li><strong>Facebook Messenger</strong> - For Design Inspiration.</li>
         </ul>
-
-        <button class="back-button" onclick="window.location.href='../index.html'">Back to Chat</button>
     </div>
-
 </body>
 </html>
