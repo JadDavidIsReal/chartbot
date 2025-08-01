@@ -133,6 +133,34 @@ body.dark-mode #user-input {
     background-color: #489;
 }
 
+#mic-btn {
+    background-color: #5a9;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s;
+    margin: 0 5px;
+}
+
+#mic-btn.recording {
+    background-color: #d94848;
+}
+
+#mic-btn.voice-active {
+    background-color: #489;
+}
+
+#mic-btn.recording:hover {
+    background-color: #b93838;
+}
+
 /* Side Menu */
 .side-menu {
     height: 100%;
@@ -209,4 +237,12 @@ body.dark-mode #user-input {
     border-radius: 50%;
     display: inline-block;
     margin-left: 10px;
+}
+
+@media (min-width: 768px) {
+    .chat-container {
+        height: 90vh;
+        max-height: 720px;
+        border-radius: 15px;
+    }
 }

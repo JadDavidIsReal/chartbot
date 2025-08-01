@@ -2,6 +2,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
+apiKeyInput.value = "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";
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
@@ -10,10 +11,12 @@ const sideMenu = document.getElementById('side-menu');
 const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
+const darkModeBtn = document.getElementById('dark-mode-btn');
 
 // Gloabl variables
 let conversationHistory = [];
 let isRecording = false;
+let isVoiceMode = false;
 
 // 2. EVENT LISTENERS
 
@@ -33,6 +36,17 @@ menuBtn.addEventListener('click', () => {
 
 closeBtn.addEventListener('click', () => {
     sideMenu.style.width = '0';
+});
+
+// Toggle dark mode
+darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
 });
 
 // Apply API key and fetch models
@@ -55,6 +69,20 @@ applyApiKeyButton.addEventListener('click', async () => {
 });
 
 // 3. API AND CHAT FUNCTIONS
+
+/**
+ * Initializes the application by testing the API key and fetching models.
+ */
+async function initializeApp() {
+    const apiKey = apiKeyInput.value.trim();
+    if (apiKey) {
+        const isValid = await testApiKey(apiKey);
+        updateApiStatus(isValid);
+        if (isValid) {
+            await fetchAndDisplayModels(apiKey);
+        }
+    }
+}
 
 /**
  * Sends a message to the Groq API and displays the response.
@@ -211,34 +239,39 @@ if (SpeechRecognition) {
     recognition.lang = 'en-US';
 
     micBtn.addEventListener('click', () => {
-        if (speechSynthesis.speaking) {
-            speechSynthesis.cancel();
-        }
+        isVoiceMode = !isVoiceMode;
 
-        if (isRecording) {
-            recognition.stop();
-            return;
+        if (isVoiceMode) {
+            micBtn.classList.add('voice-active');
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            if (!isRecording) {
+                recognition.start();
+            }
+        } else {
+            micBtn.classList.remove('voice-active');
+            if (isRecording) {
+                recognition.stop();
+            }
         }
-        userInput.value = ''; // Clear the input field
-        recognition.start();
     });
 
     recognition.onstart = () => {
         isRecording = true;
-        micBtn.style.color = 'red'; // Or some other visual indicator
-        micBtn.textContent = '...'; // Change icon to show it's listening
+        micBtn.classList.add('recording');
+        micBtn.textContent = '...';
     };
 
     recognition.onend = () => {
         isRecording = false;
-        micBtn.style.color = ''; // Reset color
-        micBtn.innerHTML = '&#127908;'; // Reset icon
+        micBtn.classList.remove('recording');
+        micBtn.innerHTML = '&#127908;';
     };
 
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         userInput.value = transcript;
-        // Automatically send the message
         sendMessage();
     };
 
@@ -262,6 +295,13 @@ function speak(text) {
     // Create a new speech utterance
     const utterance = new SpeechSynthesisUtterance(text);
 
+    // When speech ends, check if we should listen again
+    utterance.onend = () => {
+        if (isVoiceMode) {
+            recognition.start();
+        }
+    };
+
     // Optional: Configure voice, pitch, rate
     // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
     // utterance.pitch = 1;
@@ -270,3 +310,11 @@ function speak(text) {
     // Speak the text
     speechSynthesis.speak(utterance);
 }
+
+// Apply saved theme on load
+document.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+    initializeApp();
+});
