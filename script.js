@@ -245,7 +245,8 @@ async function fetchGroqResponse(apiKey) {
  */
 function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
-    newMessage.innerHTML = message.replace(/\n/g, '<br>');
+    newMessage.innerHTML = message.replace(/
+/g, '<br>');
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
 }
@@ -254,6 +255,7 @@ function appendMessage(message, sender) {
  * Fetches and displays available models from the Groq API.
  * @param {string} apiKey - The Groq API key.
  */
+
 const orderedConversationalModels = [
     "meta-llama/llama-prompt-guard-2-22m",
     "meta-llama/llama-prompt-guard-2-86m",
