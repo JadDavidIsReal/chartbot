@@ -20,6 +20,9 @@ const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
 const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
+<<<<<<< HEAD
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
+=======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 
 // Gloabl variables
@@ -45,6 +48,9 @@ aiTtsToggle.addEventListener('click', () => {
 
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
 
+<<<<<<< HEAD
+>>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
+=======
 >>>>>>> parent of 352edda (feat: Add password protection for AI TTS and update docs)
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
