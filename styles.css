@@ -174,6 +174,11 @@ body.dark-mode #user-input {
     transition: 0.5s;
     padding-top: 60px;
     color: white;
+    pointer-events: none;
+}
+
+.side-menu.side-menu-open {
+    pointer-events: auto;
 }
 
 .side-menu a {
@@ -241,8 +246,58 @@ body.dark-mode #user-input {
 
 @media (min-width: 768px) {
     .chat-container {
-        height: 90vh;
-        max-height: 720px;
-        border-radius: 15px;
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
     }
+}
+
+/* TTS Toggle Switches */
+#browser-tts-toggle, #ai-tts-toggle {
+    appearance: none;
+    width: 3em;
+    height: 1.5em;
+    background-color: #ccc;
+    border-radius: 1.5em;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#browser-tts-toggle::before, #ai-tts-toggle::before {
+    content: '';
+    width: 1.2em;
+    height: 1.2em;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.15em;
+    left: 0.15em;
+    transition: transform 0.3s;
+}
+
+#browser-tts-toggle:checked, #ai-tts-toggle:checked {
+    background-color: #5a9;
+}
+
+#browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before {
+    transform: translateX(1.5em);
+}
+
+/* Volume Slider */
+#browser-tts-volume {
+    width: calc(100% - 30px);
+}
+
+/* AI TTS Settings */
+.side-menu h3 {
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-top: 1px solid #555;
+}
+
+#ai-tts-model-select:disabled,
+#ai-tts-voice-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

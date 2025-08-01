@@ -33,6 +33,45 @@
 
             <hr>
 
+            <h2>TTS Setting</h2>
+
+            <div class="setting">
+                <label for="browser-tts-toggle">Enable Browser TTS:</label>
+                <input type="checkbox" id="browser-tts-toggle">
+            </div>
+
+            <div class="setting">
+                <label for="browser-tts-volume">Volume:</label>
+                <input type="range" id="browser-tts-volume" min="0" max="100" value="50">
+            </div>
+
+            <div class="setting">
+                <label for="browser-tts-voice-select">No AI Voice:</label>
+                <select id="browser-tts-voice-select"></select>
+            </div>
+
+            <button id="unlock-ai-tts-btn">Unlock AI TTS Settings</button>
+            <div id="ai-tts-settings" style="display: none;">
+                <h3>AI TTS Setting</h3>
+
+                <div class="setting">
+                    <label for="ai-tts-toggle">Enable AI TTS:</label>
+                    <input type="checkbox" id="ai-tts-toggle">
+                </div>
+
+                <div class="setting">
+                    <label for="ai-tts-model-select">AI Model:</label>
+                    <select id="ai-tts-model-select"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ai-tts-voice-select">AI Voice:</label>
+                    <select id="ai-tts-voice-select"></select>
+                </div>
+            </div>
+
+            <hr>
+
             <a href="HAMBURGER/documentation.html">Project Documentation</a>
             <a href="HAMBURGER/Credits.html">Credits</a>
         </div>  
@@ -44,6 +83,7 @@
             <button id="send-btn">Send</button>
         </div>  
     </div>
+    <script src="api-key.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
