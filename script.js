@@ -45,6 +45,23 @@ browserTtsToggle.addEventListener('click', () => {
     browserTtsVoiceSelect.disabled = !browserTtsEnabled;
 });
 
+browserTtsVolume.addEventListener('change', () => {
+    if (browserTtsEnabled && speechSynthesis.getVoices().length > 0) {
+        const utterance = new SpeechSynthesisUtterance('Volume');
+        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0].getAttribute('data-name');
+        const voices = speechSynthesis.getVoices();
+        const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+
+        utterance.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
+        utterance.volume = browserTtsVolume.value / 100;
+
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+        speechSynthesis.speak(utterance);
+    }
+});
+
 aiTtsToggle.addEventListener('click', () => {
     aiTtsEnabled = aiTtsToggle.checked;
     aiTtsProviderSelect.disabled = !aiTtsEnabled;
@@ -88,8 +105,6 @@ deepgramApplyBtn.addEventListener('click', async () => {
     if (isValid) {
         alert('Deepgram API Key applied successfully!');
         populateDeepgramVoices();
-    } else {
-        alert('Invalid Deepgram API Key.');
     }
 });
 
@@ -99,15 +114,21 @@ async function testDeepgramApiKey(apiKey) {
         const response = await fetch('https://api.deepgram.com/v1/speak?model=aura-asteria-en', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiKey}`,
+                'Authorization': `Token ${apiKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 text: "hello"
             })
         });
-        return response.ok;
-    } catch {
+        if (response.ok) return true;
+
+        const errorData = await response.json().catch(() => ({ reason: response.statusText }));
+        alert(`Deepgram API error: ${errorData.reason || 'Unknown error'}`);
+        return false;
+    } catch (error) {
+        console.error('Error testing Deepgram API key:', error);
+        alert('An error occurred while testing the Deepgram API key. Check the console for details.');
         return false;
     }
 }
@@ -131,6 +152,23 @@ function populateDeepgramVoices() {
         deepgramVoiceSelect.appendChild(option);
     });
 }
+
+function populateBrowserTtsVoices() {
+    const voices = speechSynthesis.getVoices();
+    browserTtsVoiceSelect.innerHTML = '';
+
+    voices
+        .filter(voice => voice.lang.startsWith('en'))
+        .forEach(voice => {
+            const option = document.createElement('option');
+            option.textContent = `${voice.name} (${voice.lang})`;
+            option.setAttribute('data-lang', voice.lang);
+            option.setAttribute('data-name', voice.name);
+            browserTtsVoiceSelect.appendChild(option);
+        });
+}
+
+speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
 
 
 const groqTtsVoices = {
@@ -534,7 +572,7 @@ async function speak(text) {
                 const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`,
+                        'Authorization': `Token ${apiKey}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -589,5 +627,6 @@ document.addEventListener('DOMContentLoaded', () => {
     populateAiTtsModels();
     populateAiTtsVoices();
     populateDeepgramVoices();
+    populateBrowserTtsVoices();
     initializeApp();
 });
