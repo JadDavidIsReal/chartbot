@@ -161,21 +161,13 @@ body.dark-mode #user-input {
 }
 
 #mic-btn {
+    background-color: #7FFF00; /* chartreuse */
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    border-radius: 20px;
+    padding: 10px 20px;
     cursor: pointer;
-    font-size: 1.4em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-#mic-btn {
-    background-color: #aaa;
+    font-size: 1em;
     margin: 0 5px;
 }
 
@@ -204,7 +196,7 @@ body.dark-mode #user-input {
     z-index: 100;
     top: 0;
     left: 0;
-    background-color: #282828;
+    background-color: var(--dark-primary-color);
     overflow-x: hidden;
     overflow-y: auto;
     transition: 0.5s;
@@ -213,6 +205,9 @@ body.dark-mode #user-input {
     pointer-events: none;
     box-sizing: border-box;
     box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+}
+body.dark-mode .side-menu {
+    background-color: #282828;
 }
 
 .side-menu.side-menu-open {
