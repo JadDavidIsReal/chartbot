@@ -12,6 +12,8 @@ const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
 const darkModeBtn = document.getElementById('dark-mode-btn');
+const sunIcon = document.querySelector('.sun-icon');
+const moonIcon = document.querySelector('.moon-icon');
 const browserTtsToggle = document.getElementById('browser-tts-toggle');
 const browserTtsVolume = document.getElementById('browser-tts-volume');
 const aiTtsToggle = document.getElementById('ai-tts-toggle');
@@ -244,8 +246,12 @@ darkModeBtn.addEventListener('click', () => {
 
     if (document.body.classList.contains('dark-mode')) {
         localStorage.setItem('theme', 'dark');
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
     } else {
         localStorage.setItem('theme', 'light');
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
     }
 });
 
