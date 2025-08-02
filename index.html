@@ -53,18 +53,34 @@
             <h3>AI TTS Setting</h3>
 
             <div class="setting">
-                <label for="ai-tts-toggle">Enable AI TTS:</label>
-                <input type="checkbox" id="ai-tts-toggle">
+                <label for="ai-tts-password">Password:</label>
+                <input type="password" id="ai-tts-password" placeholder="Enter password to unlock">
+                <button id="ai-tts-unlock-btn">Unlock</button>
             </div>
 
-            <div class="setting">
-                <label for="ai-tts-model-select">AI Model:</label>
-                <select id="ai-tts-model-select"></select>
-            </div>
+            <div id="ai-tts-settings" style="display: none;">
+                <div class="setting">
+                    <label for="playht-api-key">Play.ht API Key:</label>
+                    <input type="text" id="playht-api-key" placeholder="Enter your Play.ht API Key"/>
+                </div>
+                <div class="setting">
+                    <label for="playht-user-id">Play.ht User ID:</label>
+                    <input type="text" id="playht-user-id" placeholder="Enter your Play.ht User ID"/>
+                </div>
+                <div class="setting">
+                    <label for="ai-tts-toggle">Enable AI TTS:</label>
+                    <input type="checkbox" id="ai-tts-toggle">
+                </div>
 
-            <div class="setting">
-                <label for="ai-tts-voice-select">AI Voice:</label>
-                <select id="ai-tts-voice-select"></select>
+                <div class="setting">
+                    <label for="ai-tts-model-select">AI Model:</label>
+                    <select id="ai-tts-model-select"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ai-tts-voice-select">AI Voice:</label>
+                    <select id="ai-tts-voice-select"></select>
+                </div>
             </div>
 
             <hr>
