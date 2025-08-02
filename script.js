@@ -21,8 +21,6 @@ const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select'
 const aiTtsPasswordInput = document.getElementById('ai-tts-password');
 const aiTtsUnlockBtn = document.getElementById('ai-tts-unlock-btn');
 const aiTtsSettings = document.getElementById('ai-tts-settings');
-const playHtApiKeyInput = document.getElementById('playht-api-key');
-const playHtUserIdInput = document.getElementById('playht-user-id');
 
 // Gloabl variables
 let conversationHistory = [];
@@ -45,9 +43,24 @@ aiTtsToggle.addEventListener('click', () => {
     aiTtsVoiceSelect.disabled = !aiTtsEnabled;
 });
 
+
+const groqTtsVoices = {
+    'playai-tts': [
+        'Arista-PlayAI', 'Atlas-PlayAI', 'Basil-PlayAI', 'Briggs-PlayAI', 'Calum-PlayAI',
+        'Celeste-PlayAI', 'Cheyenne-PlayAI', 'Chip-PlayAI', 'Cillian-PlayAI', 'Deedee-PlayAI',
+        'Fritz-PlayAI', 'Gail-PlayAI', 'Indigo-PlayAI', 'Mamaw-PlayAI', 'Mason-PlayAI',
+        'Mikail-PlayAI', 'Mitch-PlayAI', 'Quinn-PlayAI', 'Thunder-PlayAI'
+    ],
+    'playai-tts-arabic': [
+        'Ahmad-PlayAI', 'Amira-PlayAI', 'Khalid-PlayAI', 'Nasser-PlayAI'
+    ]
+};
+
 function populateAiTtsModels() {
     aiTtsModelSelect.innerHTML = '';
-    const models = ['Play.ht', 'Play.ht Arabic'];
+    const models = Object.keys(groqTtsVoices);
+
+
     models.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
@@ -56,48 +69,17 @@ function populateAiTtsModels() {
     });
 }
 
-async function populateAiTtsVoices() {
+function populateAiTtsVoices() {
     const selectedModel = aiTtsModelSelect.value;
-    const apiKey = playHtApiKeyInput.value.trim();
-    const userId = playHtUserIdInput.value.trim();
+    const voices = groqTtsVoices[selectedModel] || [];
 
-    if (!apiKey || !userId) {
-        // Don't alert here, as this function is called on model change.
-        // The user might not have entered the key yet.
-        return;
-    }
-
-    try {
-        const response = await fetch('https://api.play.ht/api/v2/voices', {
-            headers: {
-                'Authorization': apiKey,
-                'X-USER-ID': userId,
-                'accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error_message || 'Failed to fetch Play.ht voices.');
-        }
-
-        const voices = await response.json();
-        aiTtsVoiceSelect.innerHTML = '';
-
-        const languagePrefix = selectedModel === 'Play.ht Arabic' ? 'ar' : 'en';
-
-        voices
-            .filter(voice => voice.language.startsWith(languagePrefix))
-            .forEach(voice => {
-                const option = document.createElement('option');
-                option.value = voice.id;
-                option.textContent = `${voice.name} (${voice.language})`;
-                aiTtsVoiceSelect.appendChild(option);
-            });
-    } catch (error) {
-        console.error('Error fetching Play.ht voices:', error);
-        alert('Error fetching Play.ht voices: ' + error.message);
-    }
+    aiTtsVoiceSelect.innerHTML = '';
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice;
+        option.textContent = voice;
+        aiTtsVoiceSelect.appendChild(option);
+    });
 }
 
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
@@ -395,7 +377,7 @@ if (SpeechRecognition) {
 // 5. TEXT-TO-SPEECH (TTS)
 
 /**
- * Speaks the given text using the browser's SpeechSynthesis API or Play.ht API.
+ * Speaks the given text using the browser's SpeechSynthesis API or Groq TTS API.
  * @param {string} text - The text to be spoken.
  */
 async function speak(text) {
@@ -404,36 +386,34 @@ async function speak(text) {
     }
 
     if (aiTtsEnabled) {
-        const apiKey = playHtApiKeyInput.value.trim();
-        const userId = playHtUserIdInput.value.trim();
-        const voiceId = aiTtsVoiceSelect.value;
 
-        if (!apiKey || !userId || !voiceId) {
-            appendMessage('AI TTS is enabled, but API Key, User ID, or Voice is not selected.', 'ai');
+        const apiKey = apiKeyInput.value.trim();
+        const model = aiTtsModelSelect.value;
+        const voice = aiTtsVoiceSelect.value;
+
+        if (!apiKey || !model || !voice) {
+            appendMessage('AI TTS is enabled, but API Key, Model, or Voice is not selected.', 'ai');
             return;
         }
 
         try {
-            const response = await fetch('https://api.play.ht/api/v2/tts', {
+            const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
-                    'X-USER-ID': userId,
-                    'Content-Type': 'application/json',
-                    'Accept': 'audio/mpeg'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    text: text,
-                    voice: voiceId,
-                    output_format: 'mp3',
-                    speed: 1,
-                    sample_rate: 24000,
+                    model: model,
+                    input: text,
+                    voice: voice
                 })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error_message || 'Failed to generate speech.');
+
+                throw new Error(errorData.error.message || 'Failed to generate speech.');
             }
 
             const audioBlob = await response.blob();
@@ -448,9 +428,10 @@ async function speak(text) {
             };
 
         } catch (error) {
-            console.error('Error with Play.ht TTS:', error);
+            console.error('Error with Groq TTS:', error);
             appendMessage('Error generating speech: ' + error.message, 'ai');
         }
+
 
     } else if (browserTtsEnabled) {
         const utterance = new SpeechSynthesisUtterance(text);
@@ -476,5 +457,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('dark-mode');
     }
     populateAiTtsModels();
+    populateAiTtsVoices();
     initializeApp();
 });
