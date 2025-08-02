@@ -4,34 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Documentation</title>
-    <link rel="stylesheet" href="../other-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #7FFF00;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #66CC00;
+        }
+    </style>
 </head>
 <body>
-    <button class="back-button" onclick="window.location.href='../index.html'">Back to Chat</button>
+    <a href="../index.html" class="back-button">Back to Chat</a>
     <div class="container">
         <h1>Chartbot Documentation</h1>
+
         <h2>Introduction</h2>
-        <p>This documentation provides an overview of the Chatbot project named CHARTBOT, developed using the OpenAI and KoboldAI(a work in progress) API. The chatbot is designed to deliver conversational responses based on user input.</p>
+        <p>This documentation provides an overview of Chartbot, a conversational AI project developed using the Groq API. The chatbot is designed to deliver fast and natural-sounding responses based on user input.</p>
         
         <h2>Features</h2>
         <ul>
-            <li>Interactive chat interface</li>
-            <li>Ability to send messages and receive AI-generated responses</li>
-            <li>Option to choose from different AI models (work in progress)</li>
+            <li>Interactive and responsive chat interface.</li>
+            <li>AI-generated responses powered by the Groq API, using the <code>llama-3.1-8b-instant</code> model.</li>
+            <li>Text-to-Speech (TTS) functionality with two modes:
+                <ul>
+                    <li><strong>Browser TTS:</strong> Uses the browser's built-in speech synthesis.</li>
+                    <li><strong>AI TTS:</strong> Uses Google's TTS service for more natural voices.</li>
+                </ul>
+            </li>
+            <li>Speech recognition for voice input.</li>
+            <li>Dark mode support.</li>
+            <li>Customizable theme color (currently chartreuse).</li>
         </ul>
         
         <h2>Setup</h2>
-        <p>To start using the chatbot, open the <code>index.html</code> file in your browser. You will need to enter your API key in the settings to enable the chatbot functionality.</p>
-        
-        <h2>Requirements (Read carefully)</h2>
-        <ul>
-            <li>-OpenAI API Key (Do not use said keys elsewhere) as it is under AGPL license.</li>
-            <li>-Free test API Key (Kobold API):</li>
-            <li>FDWdkGMPV_6VBfhEpomLXQ</li>
-            <li>-Free test API Key (OpenAI API zero token $ balance):</li>
-            <li>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</li>
-            <li>-Optional APIs for TTS and NLP (Work in progress)</li>
-        </ul>
+        <p>To start using the chatbot, open the <code>index.html</code> file in your browser. You will need to enter your Groq API key in the settings menu to enable the chatbot functionality.</p>
         
         <h2>Contact</h2>
         <p>For any questions or support, please contact the developer at <a href="mailto:david.jad@icloud.com">david.jad@icloud.com</a>.</p>

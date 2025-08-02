@@ -32,20 +32,51 @@ browserTtsToggle.addEventListener('click', () => {
     browserTtsEnabled = browserTtsToggle.checked;
     browserTtsVolume.disabled = !browserTtsEnabled;
     browserTtsVoiceSelect.disabled = !browserTtsEnabled;
+    if (browserTtsEnabled) {
+        aiTtsToggle.checked = false;
+        aiTtsEnabled = false;
+        aiTtsVoiceSelect.disabled = true;
+    }
 });
 
 aiTtsToggle.addEventListener('click', () => {
     aiTtsEnabled = aiTtsToggle.checked;
-    aiTtsModelSelect.disabled = !aiTtsEnabled;
+    aiTtsModelSelect.disabled = true; // No model selection for this TTS
     aiTtsVoiceSelect.disabled = !aiTtsEnabled;
+    if (aiTtsEnabled) {
+        browserTtsToggle.checked = false;
+        browserTtsEnabled = false;
+        browserTtsVolume.disabled = true;
+        browserTtsVoiceSelect.disabled = true;
+    }
 });
 
-// This function is missing, I will add a placeholder.
-function populateAiTtsVoices() {
-    console.log("Populating AI TTS voices (not implemented yet)");
+function populateBrowserTtsVoices() {
+    const voices = speechSynthesis.getVoices();
+    browserTtsVoiceSelect.innerHTML = '';
+    voices.filter(v => v.lang.startsWith('en')).forEach(voice => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.setAttribute('data-name', voice.name);
+        browserTtsVoiceSelect.appendChild(option);
+    });
 }
 
-aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
+function populateAiTtsVoices() {
+    aiTtsVoiceSelect.innerHTML = '';
+    const voices = [
+        { name: 'English (US)', lang: 'en-US' },
+        { name: 'English (UK)', lang: 'en-GB' },
+        { name: 'English (AU)', lang: 'en-AU' },
+    ];
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.lang;
+        option.textContent = voice.name;
+        aiTtsVoiceSelect.appendChild(option);
+    });
+}
+
 
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
@@ -201,15 +232,7 @@ function appendMessage(message, sender) {
  * @param {string} apiKey - The Groq API key.
  */
 const orderedConversationalModels = [
-    "meta-llama/llama-prompt-guard-2-22m",
-    "meta-llama/llama-prompt-guard-2-86m",
-    "llama-3.1-8b-instant",
-    "llama3-8b-8192",
-    "meta-llama/llama-guard-4-12b",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "llama3-3.3-70b-versatile",
-    "llama3-70b-8192"
+    "llama-3.1-8b-instant"
 ];
 
 async function fetchAndDisplayModels(apiKey) {
@@ -339,28 +362,41 @@ if (SpeechRecognition) {
 // 5. TEXT-TO-SPEECH (TTS)
 
 /**
- * Speaks the given text using the browser's SpeechSynthesis API.
+ * Speaks the given text using the browser's SpeechSynthesis API or AI TTS.
  * @param {string} text - The text to be spoken.
  */
 function speak(text) {
-    if (!browserTtsEnabled) return;
-    // Create a new speech utterance
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Stop any currently speaking synthesis
+    speechSynthesis.cancel();
 
-    // When speech ends, check if we should listen again
-    utterance.onend = () => {
-        if (isVoiceMode) {
-            recognition.start();
-        }
-    };
+    if (aiTtsEnabled) {
+        const lang = aiTtsVoiceSelect.value;
+        const encodedText = encodeURIComponent(text);
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
 
-    // Optional: Configure voice, pitch, rate
-    // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
-    // utterance.pitch = 1;
-    // utterance.rate = 1;
+        const audio = new Audio(url);
+        audio.play();
+        audio.onended = () => {
+            if (isVoiceMode) {
+                recognition.start();
+            }
+        };
+    } else if (browserTtsEnabled) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0].getAttribute('data-name');
+        const voices = speechSynthesis.getVoices();
+        const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
 
-    // Speak the text
-    speechSynthesis.speak(utterance);
+        utterance.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
+        utterance.volume = browserTtsVolume.value / 100;
+
+        utterance.onend = () => {
+            if (isVoiceMode) {
+                recognition.start();
+            }
+        };
+        speechSynthesis.speak(utterance);
+    }
 }
 
 // Apply saved theme on load
@@ -368,5 +404,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+
+    populateAiTtsVoices();
+    // Voices are loaded asynchronously
+    speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
+    populateBrowserTtsVoices(); // Populate with any voices available initially
+
+    // Disable TTS sections by default
+    browserTtsVolume.disabled = true;
+    browserTtsVoiceSelect.disabled = true;
+    aiTtsModelSelect.disabled = true;
+    aiTtsVoiceSelect.disabled = true;
+
     initializeApp();
 });
