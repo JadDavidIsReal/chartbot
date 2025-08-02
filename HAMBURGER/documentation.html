@@ -78,6 +78,32 @@
         th {
             background-color: #f2f2f2;
         }
+        body.dark-mode {
+            background-color: #121212;
+            color: #f4f4f9;
+        }
+        body.dark-mode .container {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4 {
+            color: #f4f4f9;
+        }
+        body.dark-mode h1 {
+            border-bottom: 2px solid #444;
+        }
+        body.dark-mode h2 {
+            border-bottom: 1px solid #444;
+        }
+        body.dark-mode code {
+            background-color: #3a3a3c;
+        }
+        body.dark-mode th {
+            background-color: #3a3a3c;
+        }
+        body.dark-mode td {
+            border: 1px solid #444;
+        }
     </style>
 </head>
 <body>
@@ -211,5 +237,12 @@ const colorMap = {
         <h2>7. Contact</h2>
         <p>For any questions or support, please contact the developer at <a href="mailto:david.jad@icloud.com">david.jad@icloud.com</a>.</p>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
 </body>
 </html>
