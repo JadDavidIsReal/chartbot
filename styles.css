@@ -1,13 +1,13 @@
 /* General Body Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1A2A1A;
+    background-color: #f4f4f9;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: #EAEAEA;
+    color: #333;
 }
 
 /* Dark Mode */
@@ -23,7 +23,7 @@ body.dark-mode {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background-color: #1A2A1A;
+    background-color: #fff;
 }
 
 body.dark-mode .chat-container {
@@ -32,7 +32,7 @@ body.dark-mode .chat-container {
 
 .chat-header {
     background-color: #7FFF00; /* chartreuse */
-    color: white;
+    color: #333333;
     padding: 15px 20px;
     font-size: 1.5em;
     display: flex;
@@ -49,7 +49,7 @@ body.dark-mode .chat-header {
 .menu-btn, .dark-mode-btn {
     background: none;
     border: none;
-    color: white;
+    color: #333333;
     font-size: 1.5em;
     cursor: pointer;
 }
@@ -61,7 +61,6 @@ body.dark-mode .chat-header {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: #2A3A2A;
 }
 
 .user-message, .ai-message {
@@ -69,18 +68,19 @@ body.dark-mode .chat-header {
     border-radius: 20px;
     max-width: 70%;
     line-height: 1.5;
+    animation: fadeInUp 0.5s ease-in-out;
 }
 
 .user-message {
     background-color: #7FFF00; /* chartreuse */
-    color: white;
+    color: #333333;
     align-self: flex-end;
     border-bottom-right-radius: 5px;
 }
 
 .ai-message {
-    background-color: #1A2A1A;
-    color: #EAEAEA;
+    background-color: #e5e5ea;
+    color: #333;
     align-self: flex-start;
     border-bottom-left-radius: 5px;
 }
@@ -118,7 +118,7 @@ body.dark-mode #user-input {
 
 #send-btn {
     background-color: #7FFF00; /* chartreuse */
-    color: white;
+    color: #333333;
     border: none;
     border-radius: 20px;
     padding: 10px 20px;
@@ -126,13 +126,14 @@ body.dark-mode #user-input {
     font-size: 1em;
 }
 
-#send-btn:hover {
+#send-btn:hover, #mic-btn:hover {
     background-color: #66CC00; /* darker chartreuse */
+    animation: zoomIn 0.2s;
 }
 
 #mic-btn {
     background-color: #7FFF00; /* chartreuse */
-    color: white;
+    color: #333333;
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -232,7 +233,7 @@ body.dark-mode #user-input {
     border-radius: 5px;
     border: none;
     background-color: #7FFF00; /* chartreuse */
-    color: white;
+    color: #333333;
     cursor: pointer;
     box-sizing: border-box;
 }
@@ -294,4 +295,25 @@ body.dark-mode #user-input {
 #ai-tts-voice-select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.05);
+    }
 }
