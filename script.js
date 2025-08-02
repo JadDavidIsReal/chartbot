@@ -36,6 +36,7 @@ let isRecording = false;
 let isVoiceMode = false;
 let browserTtsEnabled = false;
 let aiTtsEnabled = false;
+let systemPrompt = "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term.";
 
 // 2. EVENT LISTENERS
 
@@ -296,6 +297,7 @@ async function initializeApp() {
             await fetchAndDisplayModels(apiKey);
         }
     }
+    appendMessage("Welcome to Chartbot! Type `/help` to see available commands.", 'ai');
 }
 
 /**
@@ -304,6 +306,12 @@ async function initializeApp() {
 async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
+
+    if (message.startsWith('/')) {
+        handleCommand(message);
+        userInput.value = '';
+        return;
+    }
 
     appendMessage(message, 'user');
     conversationHistory.push({ role: 'user', content: message });
@@ -336,6 +344,64 @@ async function sendMessage() {
 }
 
 /**
+ * Handles slash commands.
+ * @param {string} command - The command entered by the user.
+ */
+function handleCommand(command) {
+    const [cmd, ...args] = command.split(' ');
+    const argument = args.join(' ');
+
+    switch (cmd) {
+        case '/help':
+            const helpMessage = `
+                <strong>Available Commands:</strong><br>
+                <code>/help</code> - Shows this help message.<br>
+                <code>/clear</code> - Clears the chat history.<br>
+                <code>/theme &lt;color&gt;</code> - Changes the theme color. Available colors: <code>chartreuse</code>, <code>blue</code>, <code>red</code>, <code>purple</code>.<br>
+                <code>/system &lt;prompt&gt;</code> - Sets a new system prompt.<br>
+                <code>/history</code> - Displays the current conversation history.
+            `;
+            appendMessage(helpMessage, 'ai');
+            break;
+        case '/clear':
+            chatBox.innerHTML = '';
+            conversationHistory = [];
+            appendMessage('Chat history cleared.', 'ai');
+            break;
+        case '/theme':
+            const validColors = ['chartreuse', 'blue', 'red', 'purple'];
+            if (validColors.includes(argument)) {
+                const colorMap = {
+                    'chartreuse': '#7FFF00',
+                    'blue': '#007bff',
+                    'red': '#dc3545',
+                    'purple': '#6f42c1'
+                };
+                document.documentElement.style.setProperty('--primary-color', colorMap[argument]);
+                appendMessage(`Theme color changed to ${argument}.`, 'ai');
+            } else {
+                appendMessage(`Invalid color. Available colors: ${validColors.join(', ')}.`, 'ai');
+            }
+            break;
+        case '/system':
+            if (argument) {
+                systemPrompt = argument;
+                appendMessage(`System prompt updated to: "${argument}"`, 'ai');
+            } else {
+                appendMessage('Please provide a system prompt.', 'ai');
+            }
+            break;
+        case '/history':
+            const historyMessage = conversationHistory.map(msg => `<strong>${msg.role}:</strong> ${msg.content}`).join('<br>');
+            appendMessage(historyMessage || 'No history yet.', 'ai');
+            break;
+        default:
+            appendMessage(`Unknown command: ${cmd}`, 'ai');
+    }
+}
+
+
+/**
  * Fetches a response from the Groq API.
  * @param {string} apiKey - The Groq API key.
  * @returns {Promise<string>} - The AI's response.
@@ -343,12 +409,7 @@ async function sendMessage() {
 async function fetchGroqResponse(apiKey) {
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const systemPrompt = {
-        role: 'system',
-        content: "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term."
-    };
-
-    const messagesWithSystemPrompt = [systemPrompt, ...conversationHistory];
+    const messagesWithSystemPrompt = [{ role: 'system', content: systemPrompt }, ...conversationHistory];
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -381,7 +442,9 @@ function appendMessage(message, sender) {
     newMessage.innerHTML = linkify(message.replace(/\n/g, '<br>'));
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 
 function linkify(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
