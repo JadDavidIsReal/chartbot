@@ -1,13 +1,13 @@
 /* General Body Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #E0F7FA;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: #333;
+    color: #333333;
 }
 
 /* Dark Mode */
@@ -23,7 +23,7 @@ body.dark-mode {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background-color: #fff;
+    background-color: #FFFFFF;
 }
 
 body.dark-mode .chat-container {
@@ -31,7 +31,7 @@ body.dark-mode .chat-container {
 }
 
 .chat-header {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #007BFF;
     color: white;
     padding: 15px 20px;
     font-size: 1.5em;
@@ -71,15 +71,15 @@ body.dark-mode .chat-header {
 }
 
 .user-message {
-    background-color: #7FFF00; /* chartreuse */
-    color: white;
+    background-color: #007BFF;
+    color: #FFFFFF;
     align-self: flex-end;
     border-bottom-right-radius: 5px;
 }
 
 .ai-message {
-    background-color: #e5e5ea;
-    color: #333;
+    background-color: #F1F1F1;
+    color: #333333;
     align-self: flex-start;
     border-bottom-left-radius: 5px;
 }
@@ -116,7 +116,7 @@ body.dark-mode #user-input {
 }
 
 #send-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #007BFF;
     color: white;
     border: none;
     border-radius: 20px;
@@ -126,11 +126,11 @@ body.dark-mode #user-input {
 }
 
 #send-btn:hover {
-    background-color: #66CC00; /* darker chartreuse */
+    background-color: #0056b3;
 }
 
 #mic-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #007BFF;
     color: white;
     border: none;
     border-radius: 50%;
@@ -150,7 +150,7 @@ body.dark-mode #user-input {
 }
 
 #mic-btn.voice-active {
-    background-color: #66CC00; /* darker chartreuse */
+    background-color: #0056b3;
 }
 
 #mic-btn.recording:hover {
@@ -230,7 +230,7 @@ body.dark-mode #user-input {
     width: 100%;
     border-radius: 5px;
     border: none;
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #007BFF;
     color: white;
     cursor: pointer;
     box-sizing: border-box;
@@ -270,7 +270,7 @@ body.dark-mode #user-input {
 }
 
 #browser-tts-toggle:checked, #ai-tts-toggle:checked, #groq-tts-toggle:checked {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #007BFF;
 }
 
 #browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before, #groq-tts-toggle:checked::before {
