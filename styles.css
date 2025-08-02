@@ -61,6 +61,7 @@ body.dark-mode .chat-header {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    background-color: #2A3A2A;
 }
 
 .user-message, .ai-message {
@@ -78,7 +79,7 @@ body.dark-mode .chat-header {
 }
 
 .ai-message {
-    background-color: #2A3A2A;
+    background-color: #1A2A1A;
     color: #EAEAEA;
     align-self: flex-start;
     border-bottom-left-radius: 5px;
@@ -293,14 +294,4 @@ body.dark-mode #user-input {
 #ai-tts-voice-select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.dark-mode-btn svg {
-    width: 24px;
-    height: 24px;
-    color: white;
-}
-
-.moon-icon {
-    display: none;
 }
