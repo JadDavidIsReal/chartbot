@@ -65,13 +65,39 @@
                 </div>
 
                 <div class="setting">
-                    <label for="ai-tts-model-select">AI Model:</label>
-                    <select id="ai-tts-model-select"></select>
+                    <label for="ai-tts-provider-select">AI TTS Provider:</label>
+                    <select id="ai-tts-provider-select">
+                        <option value="groq">Groq</option>
+                        <option value="deepgram">Deepgram</option>
+                    </select>
                 </div>
 
-                <div class="setting">
-                    <label for="ai-tts-voice-select">AI Voice:</label>
-                    <select id="ai-tts-voice-select"></select>
+                <div id="groq-tts-settings">
+                    <div class="setting">
+                        <label for="groq-tts-toggle">Enable Groq TTS:</label>
+                        <input type="checkbox" id="groq-tts-toggle">
+                    </div>
+                    <div class="setting">
+                        <label for="ai-tts-model-select">AI Model:</label>
+                        <select id="ai-tts-model-select"></select>
+                    </div>
+                    <div class="setting">
+                        <label for="ai-tts-voice-select">AI Voice:</label>
+                        <select id="ai-tts-voice-select"></select>
+                    </div>
+                </div>
+
+                <div id="deepgram-tts-settings" style="display: none;">
+                    <div class="setting">
+                        <label for="deepgram-api-key">Deepgram API Key:</label>
+                        <input type="text" id="deepgram-api-key" placeholder="Enter your Deepgram API Key"/>
+                        <span id="deepgram-api-status" class="status-dot"></span>
+                    </div>
+                    <button id="deepgram-apply-btn">Apply</button>
+                    <div class="setting">
+                        <label for="deepgram-voice-select">Deepgram Voice:</label>
+                        <select id="deepgram-voice-select"></select>
+                    </div>
                 </div>
             </div>
 

@@ -21,6 +21,14 @@ const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select'
 const aiTtsPasswordInput = document.getElementById('ai-tts-password');
 const aiTtsUnlockBtn = document.getElementById('ai-tts-unlock-btn');
 const aiTtsSettings = document.getElementById('ai-tts-settings');
+const aiTtsProviderSelect = document.getElementById('ai-tts-provider-select');
+const groqTtsSettings = document.getElementById('groq-tts-settings');
+const deepgramTtsSettings = document.getElementById('deepgram-tts-settings');
+const groqTtsToggle = document.getElementById('groq-tts-toggle');
+const deepgramApiKeyInput = document.getElementById('deepgram-api-key');
+const deepgramApiStatus = document.getElementById('deepgram-api-status');
+const deepgramApplyBtn = document.getElementById('deepgram-apply-btn');
+const deepgramVoiceSelect = document.getElementById('deepgram-voice-select');
 
 // Gloabl variables
 let conversationHistory = [];
@@ -39,9 +47,90 @@ browserTtsToggle.addEventListener('click', () => {
 
 aiTtsToggle.addEventListener('click', () => {
     aiTtsEnabled = aiTtsToggle.checked;
-    aiTtsModelSelect.disabled = !aiTtsEnabled;
-    aiTtsVoiceSelect.disabled = !aiTtsEnabled;
+    aiTtsProviderSelect.disabled = !aiTtsEnabled;
+    // show/hide provider settings based on selection
+    const selectedProvider = aiTtsProviderSelect.value;
+    if(aiTtsEnabled){
+        if (selectedProvider === 'groq') {
+            groqTtsSettings.style.display = 'block';
+            deepgramTtsSettings.style.display = 'none';
+        } else if (selectedProvider === 'deepgram') {
+            groqTtsSettings.style.display = 'none';
+            deepgramTtsSettings.style.display = 'block';
+        }
+    } else {
+        groqTtsSettings.style.display = 'none';
+        deepgramTtsSettings.style.display = 'none';
+    }
 });
+
+aiTtsProviderSelect.addEventListener('change', () => {
+    const selectedProvider = aiTtsProviderSelect.value;
+    if (selectedProvider === 'groq') {
+        groqTtsSettings.style.display = 'block';
+        deepgramTtsSettings.style.display = 'none';
+    } else if (selectedProvider === 'deepgram') {
+        groqTtsSettings.style.display = 'none';
+        deepgramTtsSettings.style.display = 'block';
+    }
+});
+
+deepgramApplyBtn.addEventListener('click', async () => {
+    const apiKey = deepgramApiKeyInput.value.trim();
+    if (!apiKey) {
+        alert('Please enter a valid Deepgram API Key.');
+        return;
+    }
+
+    const isValid = await testDeepgramApiKey(apiKey);
+    updateDeepgramApiStatus(isValid);
+
+    if (isValid) {
+        alert('Deepgram API Key applied successfully!');
+        populateDeepgramVoices();
+    } else {
+        alert('Invalid Deepgram API Key.');
+    }
+});
+
+async function testDeepgramApiKey(apiKey) {
+    // There is no public endpoint to list models, so we will try to generate a short audio
+    try {
+        const response = await fetch('https://api.deepgram.com/v1/speak?model=aura-asteria-en', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: "hello"
+            })
+        });
+        return response.ok;
+    } catch {
+        return false;
+    }
+}
+
+function updateDeepgramApiStatus(isValid) {
+    deepgramApiStatus.style.backgroundColor = isValid ? 'green' : 'red';
+}
+
+function populateDeepgramVoices() {
+    const deepgramVoices = [
+        "aura-asteria-en", "aura-luna-en", "aura-stella-en", "aura-athena-en",
+        "aura-hera-en", "aura-orion-en", "aura-arcas-en", "aura-perseus-en",
+        "aura-angus-en", "aura-orpheus-en", "aura-helios-en", "aura-zeus-en"
+    ];
+
+    deepgramVoiceSelect.innerHTML = '';
+    deepgramVoices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice;
+        option.textContent = voice;
+        deepgramVoiceSelect.appendChild(option);
+    });
+}
 
 
 const groqTtsVoices = {
@@ -386,53 +475,94 @@ async function speak(text) {
     }
 
     if (aiTtsEnabled) {
+        const selectedProvider = aiTtsProviderSelect.value;
 
-        const apiKey = apiKeyInput.value.trim();
-        const model = aiTtsModelSelect.value;
-        const voice = aiTtsVoiceSelect.value;
+        if (selectedProvider === 'groq' && groqTtsToggle.checked) {
+            const apiKey = apiKeyInput.value.trim();
+            const model = aiTtsModelSelect.value;
+            const voice = aiTtsVoiceSelect.value;
 
-        if (!apiKey || !model || !voice) {
-            appendMessage('AI TTS is enabled, but API Key, Model, or Voice is not selected.', 'ai');
-            return;
-        }
-
-        try {
-            const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: model,
-                    input: text,
-                    voice: voice
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-
-                throw new Error(errorData.error.message || 'Failed to generate speech.');
+            if (!apiKey || !model || !voice) {
+                appendMessage('Groq TTS is enabled, but API Key, Model, or Voice is not selected.', 'ai');
+                return;
             }
 
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            audio.play();
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        input: text,
+                        voice: voice
+                    })
+                });
 
-            audio.onended = () => {
-                if (isVoiceMode) {
-                    recognition.start();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || 'Failed to generate speech.');
                 }
-            };
 
-        } catch (error) {
-            console.error('Error with Groq TTS:', error);
-            appendMessage('Error generating speech: ' + error.message, 'ai');
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.play();
+
+                audio.onended = () => {
+                    if (isVoiceMode) {
+                        recognition.start();
+                    }
+                };
+
+            } catch (error) {
+                console.error('Error with Groq TTS:', error);
+                appendMessage('Error generating speech from Groq: ' + error.message, 'ai');
+            }
+        } else if (selectedProvider === 'deepgram') {
+            const apiKey = deepgramApiKeyInput.value.trim();
+            const voice = deepgramVoiceSelect.value;
+
+            if (!apiKey || !voice) {
+                appendMessage('Deepgram TTS is enabled, but API Key or Voice is not selected.', 'ai');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.reason || 'Failed to generate speech.');
+                }
+
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.play();
+
+                audio.onended = () => {
+                    if (isVoiceMode) {
+                        recognition.start();
+                    }
+                };
+
+            } catch (error) {
+                console.error('Error with Deepgram TTS:', error);
+                appendMessage('Error generating speech from Deepgram: ' + error.message, 'ai');
+            }
         }
-
-
     } else if (browserTtsEnabled) {
         const utterance = new SpeechSynthesisUtterance(text);
         const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0].getAttribute('data-name');
@@ -458,5 +588,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     populateAiTtsModels();
     populateAiTtsVoices();
+    populateDeepgramVoices();
     initializeApp();
 });

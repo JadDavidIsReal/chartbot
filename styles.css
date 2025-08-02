@@ -169,9 +169,10 @@ body.dark-mode #user-input {
     overflow-x: hidden;
     overflow-y: auto; /* Added for scrolling */
     transition: 0.5s;
-    padding-top: 60px;
+    padding-block: 60px 20px;
     color: white;
     pointer-events: none;
+    box-sizing: border-box;
 }
 
 .side-menu.side-menu-open {
@@ -214,23 +215,25 @@ body.dark-mode #user-input {
 }
 
 .side-menu input, .side-menu select {
-    width: calc(100% - 30px);
+    width: 100%;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #555;
     background-color: #444;
     color: white;
+    box-sizing: border-box;
 }
 
 .side-menu button {
-    margin: 15px;
+    margin: 15px 0;
     padding: 10px 15px;
-    width: calc(100% - 30px);
+    width: 100%;
     border-radius: 5px;
     border: none;
     background-color: #7FFF00; /* chartreuse */
     color: white;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .status-dot {
@@ -243,7 +246,7 @@ body.dark-mode #user-input {
 }
 
 /* TTS Toggle Switches */
-#browser-tts-toggle, #ai-tts-toggle {
+#browser-tts-toggle, #ai-tts-toggle, #groq-tts-toggle {
     appearance: none;
     width: 3em;
     height: 1.5em;
@@ -254,7 +257,7 @@ body.dark-mode #user-input {
     transition: background-color 0.3s;
 }
 
-#browser-tts-toggle::before, #ai-tts-toggle::before {
+#browser-tts-toggle::before, #ai-tts-toggle::before, #groq-tts-toggle::before {
     content: '';
     width: 1.2em;
     height: 1.2em;
@@ -266,11 +269,11 @@ body.dark-mode #user-input {
     transition: transform 0.3s;
 }
 
-#browser-tts-toggle:checked, #ai-tts-toggle:checked {
+#browser-tts-toggle:checked, #ai-tts-toggle:checked, #groq-tts-toggle:checked {
     background-color: #7FFF00; /* chartreuse */
 }
 
-#browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before {
+#browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before, #groq-tts-toggle:checked::before {
     transform: translateX(1.5em);
 }
 
