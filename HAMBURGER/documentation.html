@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot Documentation</title>
+    <title>Chartbot Technical Documentation</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
     <style>
         body {
@@ -12,29 +12,42 @@
             padding: 20px;
             background-color: #f9f9f9;
             color: #333;
+            line-height: 1.6;
         }
         .container {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 800px;
+            padding: 30px;
+            max-width: 900px;
             margin: 20px auto;
         }
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             color: #333;
+            font-weight: 600;
         }
-        ul {
-            list-style-type: disc;
-            padding-left: 20px;
+        h1 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        li {
-            margin-bottom: 10px;
+        h2 {
+            margin-top: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
         code {
             background-color: #eee;
-            padding: 2px 4px;
+            padding: 3px 6px;
             border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
         }
         .back-button {
             display: inline-block;
@@ -52,53 +65,150 @@
         .back-button:hover {
             background-color: #66CC00;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
     <a href="../index.html" class="back-button">Back to Chat</a>
     <div class="container">
-        <h1>Chartbot Documentation</h1>
+        <h1>Chartbot Technical Documentation</h1>
 
-        <h2>Introduction</h2>
-        <p>This documentation provides an overview of Chartbot, a conversational AI project developed using the Groq API for both chat and Text-to-Speech (TTS). This new version includes a professional redesign and a powerful command system.</p>
+        <h2>1. Overview</h2>
+        <p>Chartbot is a high-performance, dependency-free conversational AI web application. It leverages modern web technologies to provide a seamless and feature-rich user experience. The application is designed to be a standalone client-side solution, interacting with external APIs for AI-powered chat and Text-to-Speech (TTS) functionalities. The entire user interface and application logic are encapsulated within three core files: <code>index.html</code>, <code>styles.css</code>, and <code>script.js</code>, demonstrating a minimalist yet powerful approach to web development.</p>
 
-        <h2>Features</h2>
+        <h2>2. Technology Stack</h2>
+        <p>The project is built with a focus on simplicity and performance, intentionally avoiding any external frameworks or libraries for its core functionality.</p>
         <ul>
-            <li>Modern, professional, and responsive chat interface.</li>
-            <li>AI-generated responses powered by the Groq API.</li>
-            <li>Client-side command system for enhanced control (see "Commands" section below).</li>
-            <li>Password-protected AI Text-to-Speech (TTS) functionality using the Groq API.</li>
-            <li>Choice of multiple AI TTS providers and voices.</li>
-            <li>Browser-based TTS as an alternative.</li>
-            <li>Speech recognition for voice input.</li>
-            <li>Dark mode support.</li>
-            <li>Customizable theme color via the <code>/theme</code> command.</li>
-        </ul>
-
-        <h2>Setup</h2>
-        <p>To start using the chatbot, open the <code>index.html</code> file in your browser. You will need to enter your Groq API key in the settings menu to enable the chatbot and TTS functionality.</p>
-        <p>To use the AI TTS, you will need to enter a password (<code>123123</code>) to unlock the feature.</p>
-
-        <h2>Commands</h2>
-        <p>Chartbot supports the following slash commands for quick actions:</p>
-        <ul>
-            <li><code>/help</code> - Shows the list of available commands.</li>
-            <li><code>/clear</code> - Clears the entire chat history from the view.</li>
-            <li><code>/theme &lt;color&gt;</code> - Changes the primary theme color of the interface.
+            <li><strong>HTML5:</strong> For the semantic structure of the application.</li>
+            <li><strong>CSS3:</strong> For styling and layout, including modern features like Custom Properties (Variables), Flexbox, and Animations.</li>
+            <li><strong>JavaScript (ES6+):</strong> For all client-side logic, including state management, API interaction, and DOM manipulation.</li>
+            <li><strong>Groq API:</strong> The primary backend service for generating conversational responses and AI-powered TTS.</li>
+            <li><strong>Deepgram API:</strong> An alternative provider for AI-powered TTS.</li>
+            <li><strong>Browser Web APIs:</strong>
                 <ul>
-                    <li>Available colors: <code>chartreuse</code>, <code>blue</code>, <code>red</code>, <code>purple</code>.</li>
-                    <li>Example: <code>/theme blue</code></li>
+                    <li><code>Fetch API</code> for making asynchronous HTTP requests to the AI services.</li>
+                    <li><code>SpeechSynthesis API</code> for native browser-based text-to-speech.</li>
+                    <li><code>SpeechRecognition API</code> for voice-to-text input.</li>
+                    <li><code>LocalStorage API</code> for persisting user settings like the dark mode theme.</li>
                 </ul>
             </li>
-            <li><code>/system &lt;prompt&gt;</code> - Sets a new system prompt for the AI. This allows you to change the chatbot's personality or instructions on the fly.
-                <ul>
-                    <li>Example: <code>/system You are a helpful assistant that only speaks in rhymes.</code></li>
-                </ul>
-            </li>
-            <li><code>/history</code> - Displays the current conversation history (user and assistant messages).</li>
         </ul>
 
-        <h2>Contact</h2>
+        <h2>3. File Structure</h2>
+        <p>The repository is organized into a flat structure for simplicity, with documentation and credits housed in a separate directory.</p>
+        <pre>
+/
+├── index.html              # The main HTML file, entry point of the application
+├── styles.css              # All CSS styles for the application
+├── script.js               # All JavaScript logic
+├── HAMBURGER/
+│   ├── documentation.html  # This documentation file
+│   └── Credits.html        # Credits and attributions
+└── ... (other repo files)
+        </pre>
+
+        <h2>4. Core Concepts</h2>
+
+        <h3>4.1. State Management</h3>
+        <p>The application state is managed through a set of global JavaScript variables. This approach was chosen for its simplicity and to avoid external dependencies. Key state variables include:</p>
+        <ul>
+            <li><code>conversationHistory</code>: An array of objects that stores the back-and-forth between the user and the AI. This is crucial for providing context to the AI for follow-up questions. The history is trimmed to the last 3 pairs of messages to manage token usage.</li>
+            <li><code>systemPrompt</code>: A string that holds the current system prompt for the AI, which can be modified by the user via the <code>/system</code> command.</li>
+            <li><code>isRecording</code>, <code>isVoiceMode</code>, <code>browserTtsEnabled</code>, <code>aiTtsEnabled</code>: Boolean flags to manage the state of the microphone and TTS functionalities.</li>
+        </ul>
+
+        <h3>4.2. API Interaction</h3>
+        <p>All interactions with external services are handled asynchronously using the <code>Fetch API</code>.</p>
+        <h4>Groq API</h4>
+        <p>The <code>fetchGroqResponse</code> function is responsible for sending the conversation history and system prompt to the Groq API's chat completions endpoint. The API key is retrieved from the input field and sent as a Bearer token in the Authorization header.</p>
+        <h4>TTS Services (Groq & Deepgram)</h4>
+        <p>The <code>speak</code> function orchestrates the TTS functionality. Based on user settings, it will either use the browser's native <code>SpeechSynthesis</code> or make a POST request to the selected AI TTS provider (Groq or Deepgram). The response is an audio blob, which is converted to an object URL and played using an HTML <code>&lt;Audio&gt;</code> element.</p>
+
+        <h3>4.3. Command System</h3>
+        <p>The command system is a client-side implementation that intercepts user inputs starting with a forward slash (<code>/</code>). The <code>sendMessage</code> function checks for this pattern and, if found, delegates the handling to the <code>handleCommand</code> function. This function uses a <code>switch</code> statement to route the command to the appropriate logic. This design allows for easy extension with new commands.</p>
+
+        <h2>5. API Reference (Slash Commands)</h2>
+        <p>The following commands are available to the user. They are processed entirely on the client-side.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Command</th>
+                    <th>Arguments</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/help</code></td>
+                    <td>None</td>
+                    <td>Displays a formatted help message with all available commands and their usage.</td>
+                </tr>
+                <tr>
+                    <td><code>/clear</code></td>
+                    <td>None</td>
+                    <td>Resets the <code>conversationHistory</code> array and clears the chatbox's inner HTML.</td>
+                </tr>
+                <tr>
+                    <td><code>/theme</code></td>
+                    <td><code>&lt;color&gt;</code></td>
+                    <td>Dynamically changes the <code>--primary-color</code> CSS variable. Accepts a predefined set of colors: <code>chartreuse</code>, <code>blue</code>, <code>red</code>, <code>purple</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>/system</code></td>
+                    <td><code>&lt;prompt&gt;</code></td>
+                    <td>Updates the global <code>systemPrompt</code> variable with the provided text. This new prompt will be used in subsequent API calls to Groq.</td>
+                </tr>
+                <tr>
+                    <td><code>/history</code></td>
+                    <td>None</td>
+                    <td>Iterates over the <code>conversationHistory</code> array and displays a formatted representation of the conversation history in the chatbox.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>6. Customization</h2>
+
+        <h3>6.1. Adding a New Theme Color</h3>
+        <p>To add a new theme color:</p>
+        <ol>
+            <li>Open <code>script.js</code>.</li>
+            <li>In the <code>handleCommand</code> function, add your new color to the <code>validColors</code> array.</li>
+            <li>Add a corresponding entry to the <code>colorMap</code> object with the color name and its hex code.</li>
+        </ol>
+        <pre><code>// Example: Adding a 'green' theme
+const validColors = ['chartreuse', 'blue', 'red', 'purple', 'green'];
+// ...
+const colorMap = {
+    'chartreuse': '#7FFF00',
+    'blue': '#007bff',
+    'red': '#dc3545',
+    'purple': '#6f42c1',
+    'green': '#28a745'
+};
+</code></pre>
+
+        <h3>6.2. Adding a New Command</h3>
+        <p>To add a new command:</p>
+        <ol>
+            <li>Open <code>script.js</code>.</li>
+            <li>In the <code>handleCommand</code> function, add a new <code>case</code> to the <code>switch</code> statement for your new command (e.g., <code>case '/yourcommand':</code>).</li>
+            <li>Implement the logic for your command within the new case.</li>
+            <li>Update the <code>/help</code> command's message to include your new command.</li>
+        </ol>
+
+        <h2>7. Contact</h2>
         <p>For any questions or support, please contact the developer at <a href="mailto:david.jad@icloud.com">david.jad@icloud.com</a>.</p>
     </div>
 </body>
