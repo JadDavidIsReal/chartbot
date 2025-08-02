@@ -139,7 +139,9 @@ function updateDeepgramApiStatus(isValid) {
 
 function populateDeepgramVoices() {
     const deepgramVoices = [
-        "aura-athena-en", "aura-orion-en"
+        "aura-asteria-en", "aura-luna-en", "aura-stella-en", "aura-athena-en",
+        "aura-hera-en", "aura-orion-en", "aura-arcas-en", "aura-perseus-en",
+        "aura-angus-en", "aura-orpheus-en", "aura-helios-en", "aura-zeus-en"
     ];
 
     deepgramVoiceSelect.innerHTML = '';
@@ -171,7 +173,10 @@ speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
 
 const groqTtsVoices = {
     'playai-tts': [
-        'Eleanor-PlayAI', 'Fritz-PlayAI'
+        'Arista-PlayAI', 'Atlas-PlayAI', 'Basil-PlayAI', 'Briggs-PlayAI', 'Calum-PlayAI',
+        'Celeste-PlayAI', 'Cheyenne-PlayAI', 'Chip-PlayAI', 'Cillian-PlayAI', 'Deedee-PlayAI',
+        'Fritz-PlayAI', 'Gail-PlayAI', 'Indigo-PlayAI', 'Mamaw-PlayAI', 'Mason-PlayAI',
+        'Mikail-PlayAI', 'Mitch-PlayAI', 'Quinn-PlayAI', 'Thunder-PlayAI'
     ],
     'playai-tts-arabic': [
         'Ahmad-PlayAI', 'Amira-PlayAI', 'Khalid-PlayAI', 'Nasser-PlayAI'
@@ -564,7 +569,7 @@ async function speak(text) {
             }
 
             try {
-                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}&smart_format=true&utterances=true&punctuation=true`, {
+                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Token ${apiKey}`,
