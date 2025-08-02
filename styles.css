@@ -150,7 +150,17 @@ body.dark-mode #user-input {
     color: var(--text-dark);
 }
 
-#send-btn, #mic-btn {
+#send-btn {
+    background-color: #7FFF00; /* chartreuse */
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+#mic-btn {
     color: white;
     border: none;
     border-radius: 50%;
@@ -162,10 +172,6 @@ body.dark-mode #user-input {
     justify-content: center;
     align-items: center;
     transition: background-color 0.3s, transform 0.2s;
-}
-
-#send-btn {
-    background-color: var(--primary-color);
 }
 
 #mic-btn {
