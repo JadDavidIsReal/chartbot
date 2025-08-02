@@ -18,6 +18,9 @@ const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
 const aiTtsVoiceSelect = document.getElementById('ai-tts-voice-select');
 const browserTtsVoiceSelect = document.getElementById('browser-tts-voice-select');
+const aiTtsPasswordInput = document.getElementById('ai-tts-password');
+const aiTtsUnlockBtn = document.getElementById('ai-tts-unlock-btn');
+const aiTtsSettings = document.getElementById('ai-tts-settings');
 
 // Gloabl variables
 let conversationHistory = [];
@@ -40,12 +43,52 @@ aiTtsToggle.addEventListener('click', () => {
     aiTtsVoiceSelect.disabled = !aiTtsEnabled;
 });
 
-// This function is missing, I will add a placeholder.
+const groqTtsVoices = {
+    'playai-tts': [
+        'Arista-PlayAI', 'Atlas-PlayAI', 'Basil-PlayAI', 'Briggs-PlayAI', 'Calum-PlayAI',
+        'Celeste-PlayAI', 'Cheyenne-PlayAI', 'Chip-PlayAI', 'Cillian-PlayAI', 'Deedee-PlayAI',
+        'Fritz-PlayAI', 'Gail-PlayAI', 'Indigo-PlayAI', 'Mamaw-PlayAI', 'Mason-PlayAI',
+        'Mikail-PlayAI', 'Mitch-PlayAI', 'Quinn-PlayAI', 'Thunder-PlayAI'
+    ],
+    'playai-tts-arabic': [
+        'Ahmad-PlayAI', 'Amira-PlayAI', 'Khalid-PlayAI', 'Nasser-PlayAI'
+    ]
+};
+
+function populateAiTtsModels() {
+    aiTtsModelSelect.innerHTML = '';
+    const models = Object.keys(groqTtsVoices);
+    models.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        aiTtsModelSelect.appendChild(option);
+    });
+}
+
 function populateAiTtsVoices() {
-    console.log("Populating AI TTS voices (not implemented yet)");
+    const selectedModel = aiTtsModelSelect.value;
+    const voices = groqTtsVoices[selectedModel] || [];
+
+    aiTtsVoiceSelect.innerHTML = '';
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice;
+        option.textContent = voice;
+        aiTtsVoiceSelect.appendChild(option);
+    });
 }
 
 aiTtsModelSelect.addEventListener('change', populateAiTtsVoices);
+
+aiTtsUnlockBtn.addEventListener('click', () => {
+    if (aiTtsPasswordInput.value === '123123') {
+        aiTtsSettings.style.display = 'block';
+        aiTtsPasswordInput.parentElement.style.display = 'none'; // Hide the password input section
+    } else {
+        alert('Incorrect password.');
+    }
+});
 
 // Send message on button click or Enter key
 sendBtn.addEventListener('click', sendMessage);
@@ -201,15 +244,7 @@ function appendMessage(message, sender) {
  * @param {string} apiKey - The Groq API key.
  */
 const orderedConversationalModels = [
-    "meta-llama/llama-prompt-guard-2-22m",
-    "meta-llama/llama-prompt-guard-2-86m",
-    "llama-3.1-8b-instant",
-    "llama3-8b-8192",
-    "meta-llama/llama-guard-4-12b",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "llama3-3.3-70b-versatile",
-    "llama3-70b-8192"
+    "llama-3.1-8b-instant"
 ];
 
 async function fetchAndDisplayModels(apiKey) {
@@ -339,28 +374,75 @@ if (SpeechRecognition) {
 // 5. TEXT-TO-SPEECH (TTS)
 
 /**
- * Speaks the given text using the browser's SpeechSynthesis API.
+ * Speaks the given text using the browser's SpeechSynthesis API or Groq TTS API.
  * @param {string} text - The text to be spoken.
  */
-function speak(text) {
-    if (!browserTtsEnabled) return;
-    // Create a new speech utterance
-    const utterance = new SpeechSynthesisUtterance(text);
+async function speak(text) {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
 
-    // When speech ends, check if we should listen again
-    utterance.onend = () => {
-        if (isVoiceMode) {
-            recognition.start();
+    if (aiTtsEnabled) {
+        const apiKey = apiKeyInput.value.trim();
+        const model = aiTtsModelSelect.value;
+        const voice = aiTtsVoiceSelect.value;
+
+        if (!apiKey || !model || !voice) {
+            appendMessage('AI TTS is enabled, but API Key, Model, or Voice is not selected.', 'ai');
+            return;
         }
-    };
 
-    // Optional: Configure voice, pitch, rate
-    // utterance.voice = speechSynthesis.getVoices()[0]; // Example: Set to the first available voice
-    // utterance.pitch = 1;
-    // utterance.rate = 1;
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    input: text,
+                    voice: voice
+                })
+            });
 
-    // Speak the text
-    speechSynthesis.speak(utterance);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message || 'Failed to generate speech.');
+            }
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+
+            audio.onended = () => {
+                if (isVoiceMode) {
+                    recognition.start();
+                }
+            };
+
+        } catch (error) {
+            console.error('Error with Groq TTS:', error);
+            appendMessage('Error generating speech: ' + error.message, 'ai');
+        }
+
+    } else if (browserTtsEnabled) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0].getAttribute('data-name');
+        const voices = speechSynthesis.getVoices();
+        const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+
+        utterance.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
+        utterance.volume = browserTtsVolume.value / 100;
+
+        utterance.onend = () => {
+            if (isVoiceMode) {
+                recognition.start();
+            }
+        };
+        speechSynthesis.speak(utterance);
+    }
 }
 
 // Apply saved theme on load
@@ -368,5 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+    populateAiTtsModels();
+    populateAiTtsVoices();
     initializeApp();
 });
