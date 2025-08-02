@@ -43,6 +43,7 @@ aiTtsToggle.addEventListener('click', () => {
     aiTtsVoiceSelect.disabled = !aiTtsEnabled;
 });
 
+
 const groqTtsVoices = {
     'playai-tts': [
         'Arista-PlayAI', 'Atlas-PlayAI', 'Basil-PlayAI', 'Briggs-PlayAI', 'Calum-PlayAI',
@@ -58,6 +59,8 @@ const groqTtsVoices = {
 function populateAiTtsModels() {
     aiTtsModelSelect.innerHTML = '';
     const models = Object.keys(groqTtsVoices);
+
+
     models.forEach(model => {
         const option = document.createElement('option');
         option.value = model;
@@ -383,6 +386,7 @@ async function speak(text) {
     }
 
     if (aiTtsEnabled) {
+
         const apiKey = apiKeyInput.value.trim();
         const model = aiTtsModelSelect.value;
         const voice = aiTtsVoiceSelect.value;
@@ -408,6 +412,7 @@ async function speak(text) {
 
             if (!response.ok) {
                 const errorData = await response.json();
+
                 throw new Error(errorData.error.message || 'Failed to generate speech.');
             }
 
@@ -426,6 +431,7 @@ async function speak(text) {
             console.error('Error with Groq TTS:', error);
             appendMessage('Error generating speech: ' + error.message, 'ai');
         }
+
 
     } else if (browserTtsEnabled) {
         const utterance = new SpeechSynthesisUtterance(text);
