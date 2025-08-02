@@ -43,6 +43,14 @@ browserTtsToggle.addEventListener('click', () => {
     browserTtsEnabled = browserTtsToggle.checked;
     browserTtsVolume.disabled = !browserTtsEnabled;
     browserTtsVoiceSelect.disabled = !browserTtsEnabled;
+
+    if (browserTtsEnabled) {
+        aiTtsToggle.checked = false;
+        aiTtsEnabled = false;
+        aiTtsProviderSelect.disabled = true;
+        groqTtsSettings.style.display = 'none';
+        deepgramTtsSettings.style.display = 'none';
+    }
 });
 
 browserTtsVolume.addEventListener('change', () => {
@@ -65,9 +73,15 @@ browserTtsVolume.addEventListener('change', () => {
 aiTtsToggle.addEventListener('click', () => {
     aiTtsEnabled = aiTtsToggle.checked;
     aiTtsProviderSelect.disabled = !aiTtsEnabled;
-    // show/hide provider settings based on selection
-    const selectedProvider = aiTtsProviderSelect.value;
-    if(aiTtsEnabled){
+
+    if (aiTtsEnabled) {
+        browserTtsToggle.checked = false;
+        browserTtsEnabled = false;
+        browserTtsVolume.disabled = true;
+        browserTtsVoiceSelect.disabled = true;
+
+        // show/hide provider settings based on selection
+        const selectedProvider = aiTtsProviderSelect.value;
         if (selectedProvider === 'groq') {
             groqTtsSettings.style.display = 'block';
             deepgramTtsSettings.style.display = 'none';
@@ -216,7 +230,7 @@ aiTtsUnlockBtn.addEventListener('click', () => {
         aiTtsSettings.style.display = 'block';
         aiTtsPasswordInput.parentElement.style.display = 'none'; // Hide the password input section
     } else {
-        alert('Incorrect password.');
+        alert('Ask for the password from Chart.');
     }
 });
 
@@ -299,7 +313,7 @@ async function sendMessage() {
 
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
-        appendMessage("Please input the key found in the Settings.", 'ai');
+        appendMessage("Error: API key is missing. Please enter your Groq API key in settings.", 'ai');
         return;
     }
 
@@ -350,7 +364,7 @@ async function fetchGroqResponse(apiKey) {
 
     if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`API request failed: ${response.status} - ${errorData.error.message}`);
+        throw new Error(`Ask for the key from Chart.`);
     }
 
     const data = await response.json();
@@ -364,9 +378,14 @@ async function fetchGroqResponse(apiKey) {
  */
 function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
-    newMessage.innerHTML = message.replace(/\n/g, '<br>');
+    newMessage.innerHTML = linkify(message.replace(/\n/g, '<br>'));
     newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
+}
+
+function linkify(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
 }
 
 /**

@@ -9,11 +9,11 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #1A2A1A;
-            color: #EAEAEA;
+            background-color: #f9f9f9;
+            color: #333;
         }
         .container {
-            background-color: #2A3A2A;
+            background-color: white;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
@@ -21,7 +21,7 @@
             margin: 20px auto;
         }
         h1, h2 {
-            color: #EAEAEA;
+            color: #333;
         }
         ul {
             list-style-type: disc;
@@ -31,7 +31,7 @@
             margin-bottom: 10px;
         }
         code {
-            background-color: #1A2A1A;
+            background-color: #eee;
             padding: 2px 4px;
             border-radius: 4px;
         }
@@ -60,25 +60,24 @@
 
         <h2>Introduction</h2>
 
-        <p>This documentation provides an overview of Chartbot, a conversational AI project developed using the Groq and Deepgram APIs for both chat and Text-to-Speech (TTS).</p>
+        <p>This documentation provides an overview of Chartbot, a conversational AI project developed using the Groq API for both chat and Text-to-Speech (TTS).</p>
+=======
+
         
         <h2>Features</h2>
         <ul>
             <li>Fullscreen, responsive chat interface.</li>
             <li>AI-generated responses powered by the Groq API, using the <code>llama-3.1-8b-instant</code> model.</li>
-            <li>Password-protected AI Text-to-Speech (TTS) functionality using the Groq and Deepgram APIs.</li>
-            <li>Choice of AI TTS providers: Groq and Deepgram.</li>
-            <li>Groq voices: <code>Eleanor-PlayAI</code> and <code>Fritz-PlayAI</code>.</li>
-            <li>Deepgram voices: <code>aura-athena-en</code> and <code>aura-orion-en</code>.</li>
+            <li>Password-protected AI Text-to-Speech (TTS) functionality using the Groq API.</li>
+            <li>Choice of two AI TTS models: <code>playai-tts</code> (for English) and <code>playai-tts-arabic</code>.</li>
             <li>Browser-based TTS as an alternative.</li>
             <li>Speech recognition for voice input.</li>
             <li>Dark mode support.</li>
-            <li>Customizable theme color ("Forest" theme with chartreuse accents).</li>
-            <li>Animations for messages and buttons.</li>
+            <li>Customizable theme color (currently chartreuse).</li>
         </ul>
         
         <h2>Setup</h2>
-        <p>To start using the chatbot, open the <code>index.html</code> file in your browser. You will need to enter your Groq API key in the settings menu to enable the chatbot and TTS functionality. To use Deepgram TTS, you will also need a Deepgram API key.</p>
+        <p>To start using the chatbot, open the <code>index.html</code> file in your browser. You will need to enter your Groq API key in the settings menu to enable the chatbot and TTS functionality.</p>
         <p>To use the AI TTS, you will need to enter a password (<code>123123</code>) to unlock the feature.</p>
         <h2>Contact</h2>
         <p>For any questions or support, please contact the developer at <a href="mailto:david.jad@icloud.com">david.jad@icloud.com</a>.</p>
