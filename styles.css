@@ -176,6 +176,25 @@ body.dark-mode #user-input {
     transform: scale(1.05);
 }
 
+.mic-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#mic-status {
+    position: absolute;
+    top: 2px;
+    right: 7px;
+    height: 10px;
+    width: 10px;
+    background-color: #bbb;
+    border-radius: 50%;
+    border: 1px solid white;
+    box-shadow: 0 0 3px rgba(0,0,0,0.5);
+    transition: background-color 0.3s;
+}
+
 #mic-btn.recording {
     background-color: #d94848;
 }
@@ -321,6 +340,68 @@ body.dark-mode .side-menu {
 
 #browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before, #groq-tts-toggle:checked::before {
     transform: translateX(1.5em);
+}
+
+/* Call UI Overlay */
+.call-ui-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.call-ui-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.call-status-container {
+    text-align: center;
+    color: white;
+}
+
+#call-status-visualizer {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    border: 5px solid var(--primary-color);
+    margin: 0 auto 20px;
+    transition: transform 0.2s, border-color 0.5s;
+}
+
+#call-status-text {
+    font-size: 1.5em;
+    font-weight: 600;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+}
+
+#end-call-btn {
+    margin-top: 50px;
+    padding: 15px 30px;
+    border-radius: 30px;
+    border: none;
+    background-color: #FF4136; /* Red */
+    color: white;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+#end-call-btn:hover {
+    background-color: #E60000;
+    transform: scale(1.05);
 }
 
 /* Volume Slider */
