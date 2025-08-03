@@ -120,11 +120,23 @@
     </div>
 
     <div id="call-ui-overlay" class="call-ui-overlay hidden">
-        <div class="call-status-container">
-            <div id="call-status-visualizer"></div>
-            <p id="call-status-text">Listening...</p>
+        <div class="call-top-bar">
+            <span class="top-bar-title">Voice Chat Active</span>
+            <span id="call-timer">00:00</span>
+            <div class="top-bar-buttons">
+                <button id="voice-toggle-btn" class="pill-btn">Use Generic Voice</button>
+                <button id="end-call-btn" class="pill-btn end-call-btn">End Call</button>
+            </div>
         </div>
-        <button id="end-call-btn">End Call</button>
+
+        <div class="call-center-stage">
+            <div id="ai-avatar" class="avatar"></div>
+            <canvas id="waveform-canvas" width="500" height="100"></canvas>
+        </div>
+
+        <div id="live-transcript-container" class="live-transcript-container">
+            <!-- Live chat bubbles will be injected here -->
+        </div>
     </div>
 
     <script src="script.js"></script>

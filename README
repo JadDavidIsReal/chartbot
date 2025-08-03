@@ -10,9 +10,10 @@ This project is an advanced, voice-first chatbot that leverages multiple AI serv
 ## Key Features
 - **Full-Duplex Voice Mode:** Engage in a natural back-and-forth conversation. The application automatically manages turn-taking, switching between listening and speaking.
 - **Interrupt-to-Speak:** Users can interrupt the AI's response at any time simply by starting to speak, just like in a human conversation.
-- **Dedicated Call UI:** A clean, focused overlay appears during the voice call, showing connection and speech status.
-- **Real-time UI Feedback:** The UI provides instant visual cues for microphone status (connecting, listening, errors) and AI activity.
-- **Transcript Synchronization:** The full conversation from a voice call is rendered into the main chat window after the call ends, preserving the interaction history.
+- **Dedicated Call UI:** A sleek, modern overlay replaces the main chat interface during a call. It features a minimalist design with a top bar for controls, a central stage for the AI avatar and user's voice waveform, and a live transcript of the most recent messages.
+- **Real-time Visual Feedback:** The UI provides rich visual feedback. The AI avatar glows when speaking, and a real-time waveform visualizer animates based on the user's microphone input.
+- **In-Call Controls:** Users can end the call or toggle between high-quality AI voices and a generic browser voice directly from the call interface. A call duration timer is also displayed.
+- **Transcript Synchronization:** The full conversation from a voice call, including the snippets shown in the live transcript, is seamlessly rendered into the main chat window after the call ends.
 - **Robust Error Handling:** The application includes pre-flight checks for microphone availability and permissions, and features a fallback mechanism for TTS services.
 
 ## Usage
