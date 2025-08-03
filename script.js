@@ -170,6 +170,10 @@ function populateDeepgramVoices() {
         option.textContent = voice;
         deepgramVoiceSelect.appendChild(option);
     });
+
+    if (deepgramVoiceSelect.options.length > 0) {
+        deepgramVoiceSelect.options[0].selected = true;
+    }
 }
 
 function populateBrowserTtsVoices() {

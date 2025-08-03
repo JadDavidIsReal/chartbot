@@ -1,23 +1,22 @@
-# Chatbot Project named CHARTBOT. BY CHART
-This project is a simple chatbot built using the Kobold AI API. It aims to provide conversational responses based on user input. I MEAN THATS THE GOAL. PROTOTYPE.
+# Chartbot: A Full-Duplex Voice Conversational AI
 
+This project is an advanced, voice-first chatbot that leverages multiple AI services to provide a fluid, real-time conversational experience. It has been updated from a simple text-based prototype to a full-duplex voice interface.
 
+## Core Technologies
+- **LLM Backend:** [Groq](https://groq.com/) for fast language model responses.
+- **Speech-to-Text (STT):** [Deepgram](https://deepgram.com/) for real-time, streaming transcription.
+- **Text-to-Speech (TTS):** Supports both Groq and Deepgram for AI-generated voices, with a fallback to the browser's native `SpeechSynthesis` API.
 
-
+## Key Features
+- **Full-Duplex Voice Mode:** Engage in a natural back-and-forth conversation. The application automatically manages turn-taking, switching between listening and speaking.
+- **Interrupt-to-Speak:** Users can interrupt the AI's response at any time simply by starting to speak, just like in a human conversation.
+- **Dedicated Call UI:** A clean, focused overlay appears during the voice call, showing connection and speech status.
+- **Real-time UI Feedback:** The UI provides instant visual cues for microphone status (connecting, listening, errors) and AI activity.
+- **Transcript Synchronization:** The full conversation from a voice call is rendered into the main chat window after the call ends, preserving the interaction history.
+- **Robust Error Handling:** The application includes pre-flight checks for microphone availability and permissions, and features a fallback mechanism for TTS services.
 
 ## Usage
-To start the chatbot, open the `index.html` file in your browser and interact with the chat interface.
-
-
-
-##Necessities:
-API Key: Kobold.AI = FDWdkGMPV_6VBfhEpomLXQ
-TTS AI API Key: TBD
-NLP Key: TBD
-
-
-## Contact
-
-You can reach me at david.jad@icloud.com
-
-:D
+1. Open `index.html` in a modern web browser (Chrome, Firefox, Edge).
+2. Enter your Groq and Deepgram API keys in the settings menu (☰).
+3. Click the microphone button (🎤) to start a voice conversation.
+4. Click the microphone button again or the "End Call" button to terminate the call.
