@@ -55,7 +55,29 @@ let callStartTime;
 // Visualizer variables
 let visualizerAnimationId;
 
+// Interruption detection variables
+let currentPlayingAudio;
+let interruptionMicStream;
+let interruptionAudioContext;
+let interruptionAnimationId;
+
 // 2. EVENT LISTENERS
+
+micBtn.addEventListener('click', () => {
+    isCallActive = !isCallActive;
+    if (isCallActive) {
+        startCall();
+    } else {
+        endCall();
+    }
+});
+
+endCallBtn.addEventListener('click', () => {
+    if (isCallActive) {
+        isCallActive = false;
+        endCall();
+    }
+});
 
 browserTtsToggle.addEventListener('click', () => {
     browserTtsEnabled = browserTtsToggle.checked;
@@ -183,10 +205,6 @@ function populateDeepgramVoices() {
         option.textContent = voice;
         deepgramVoiceSelect.appendChild(option);
     });
-
-    if (deepgramVoiceSelect.options.length > 0) {
-        deepgramVoiceSelect.options[0].selected = true;
-    }
 }
 
 function populateBrowserTtsVoices() {
@@ -306,6 +324,23 @@ applyApiKeyButton.addEventListener('click', async () => {
 
 // 3. API AND CHAT FUNCTIONS
 
+function renderCallTranscript() {
+    if (callTranscript.length > 0) {
+        for (const turn of callTranscript) {
+            appendMessage(turn.text, turn.role);
+        }
+        callTranscript = []; // Clear the transcript after rendering
+    }
+}
+
+function updateLiveTranscript() {
+    liveTranscriptContainer.innerHTML = ''; // Clear existing
+    const recentTurns = callTranscript.slice(-4); // Get last 4 turns
+    for (const turn of recentTurns) {
+        appendMessage(turn.text, turn.role, liveTranscriptContainer);
+    }
+}
+
 /**
  * Initializes the application by testing the API key and fetching models.
  */
@@ -382,6 +417,32 @@ async function sendMessage() {
         }
     } finally {
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+
+voiceToggleBtn.addEventListener('click', () => {
+    if (!aiTtsSettings.style.display || aiTtsSettings.style.display === 'none') {
+        alert("Please unlock the Advanced Realistic Narrations in the settings menu first.");
+        return;
+    }
+
+    // This simulates a click on the *other* toggle, effectively flipping the state.
+    if (aiTtsToggle.checked) {
+        browserTtsToggle.click();
+    } else {
+        aiTtsToggle.click();
+    }
+
+    updateVoiceToggleButton();
+});
+
+function updateVoiceToggleButton() {
+    if (aiTtsToggle.checked) {
+        voiceToggleBtn.textContent = 'Use Generic Voice';
+        voiceToggleBtn.title = 'Switch to standard browser voice';
+    } else {
+        voiceToggleBtn.textContent = 'Use AI Voice';
+        voiceToggleBtn.title = 'Switch to advanced AI voice';
     }
 }
 
@@ -479,29 +540,12 @@ async function fetchGroqResponse(apiKey) {
  * @param {string} message - The message content.
  * @param {string} sender - The sender of the message ('user' or 'ai').
  */
-function appendMessage(message, sender, container = chatBox) {
-    const isLiveTranscript = container === liveTranscriptContainer;
+function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
     newMessage.innerHTML = linkify(message.replace(/\n/g, '<br>'));
-
-    // Add base classes and sender-specific class
-    newMessage.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
-
-    // If it's for the live transcript, add a specific class for potential different styling
-    if (isLiveTranscript) {
-        newMessage.classList.add('live-transcript-bubble');
-    }
-
-    container.appendChild(newMessage);
-    container.scrollTop = container.scrollHeight;
-}
-
-function updateLiveTranscript() {
-    liveTranscriptContainer.innerHTML = ''; // Clear existing
-    const recentTurns = callTranscript.slice(-4); // Get last 4 turns
-    for (const turn of recentTurns) {
-        appendMessage(turn.text, turn.role, liveTranscriptContainer);
-    }
+    newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
+    chatBox.appendChild(newMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 
@@ -588,56 +632,6 @@ function updateApiStatus(isValid) {
 // 4. CALL MODE & DEEPGRAM STT
 let deepgramSocket;
 let mediaRecorder;
-let isCallActive = false;
-let isListening = false;
-
-// Interruption detection variables
-let currentPlayingAudio;
-let interruptionMicStream;
-let interruptionAudioContext;
-let interruptionAnimationId;
-
-micBtn.addEventListener('click', () => {
-    isCallActive = !isCallActive;
-    if (isCallActive) {
-        startCall();
-    } else {
-        endCall();
-    }
-});
-
-endCallBtn.addEventListener('click', () => {
-    if (isCallActive) {
-        isCallActive = false;
-        endCall();
-    }
-});
-
-voiceToggleBtn.addEventListener('click', () => {
-    if (!aiTtsSettings.style.display || aiTtsSettings.style.display === 'none') {
-        alert("Please unlock the Advanced Realistic Narrations in the settings menu first.");
-        return;
-    }
-
-    // This simulates a click on the *other* toggle, effectively flipping the state.
-    if (aiTtsToggle.checked) {
-        browserTtsToggle.click();
-    } else {
-        aiTtsToggle.click();
-    }
-
-    updateVoiceToggleButton();
-});
-
-function updateVoiceToggleButton() {
-    if (aiTtsToggle.checked) {
-        voiceToggleBtn.textContent = 'Use Generic Voice';
-        voiceToggleBtn.title = 'Switch to standard browser voice';
-    } else {
-        voiceToggleBtn.textContent = 'Use AI Voice';
-        voiceToggleBtn.title = 'Switch to advanced AI voice';
-    }
-}
 
 function updateMicStatus(status, text) {
     if (text) {
@@ -701,15 +695,6 @@ async function startCall() {
             callUiOverlay.classList.add('hidden');
             updateMicStatus('off');
         }, 2000);
-    }
-}
-
-function renderCallTranscript() {
-    if (callTranscript.length > 0) {
-        for (const turn of callTranscript) {
-            appendMessage(turn.text, turn.role);
-        }
-        callTranscript = []; // Clear the transcript after rendering
     }
 }
 
