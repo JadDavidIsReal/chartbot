@@ -111,10 +111,22 @@
         <div class="chat-box" id="chat-box"></div>
         <div class="input-container">
             <textarea id="user-input" placeholder="Type a message..."></textarea>
-            <button id="mic-btn">&#127908;</button>
+            <div class="mic-wrapper">
+                <button id="mic-btn">&#127908;</button>
+                <span id="mic-status" class="status-dot"></span>
+            </div>
             <button id="send-btn">Send</button>
-        </div>  
+        </div>
     </div>
+
+    <div id="call-ui-overlay" class="call-ui-overlay hidden">
+        <div class="call-status-container">
+            <div id="call-status-visualizer"></div>
+            <p id="call-status-text">Listening...</p>
+        </div>
+        <button id="end-call-btn">End Call</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

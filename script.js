@@ -11,8 +11,12 @@ const sideMenu = document.getElementById('side-menu');
 const closeBtn = document.getElementById('close-btn');
 const sendBtn = document.getElementById('send-btn');
 const micBtn = document.getElementById('mic-btn');
+const micStatus = document.getElementById('mic-status');
 const darkModeBtn = document.getElementById('dark-mode-btn');
 const browserTtsToggle = document.getElementById('browser-tts-toggle');
+const callUiOverlay = document.getElementById('call-ui-overlay');
+const endCallBtn = document.getElementById('end-call-btn');
+const callStatusText = document.getElementById('call-status-text');
 const browserTtsVolume = document.getElementById('browser-tts-volume');
 const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
@@ -32,8 +36,8 @@ const deepgramVoiceSelect = document.getElementById('deepgram-voice-select');
 
 // Gloabl variables
 let conversationHistory = [];
+let callTranscript = [];
 let isRecording = false;
-let isVoiceMode = false;
 let browserTtsEnabled = false;
 let aiTtsEnabled = false;
 let systemPrompt = "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term.";
@@ -313,31 +317,50 @@ async function sendMessage() {
         return;
     }
 
-    appendMessage(message, 'user');
-    conversationHistory.push({ role: 'user', content: message });
+    if (isCallActive) {
+        callTranscript.push({ role: 'user', text: message });
+    } else {
+        appendMessage(message, 'user');
+    }
 
+    conversationHistory.push({ role: 'user', content: message });
     userInput.value = '';
     chatBox.scrollTop = chatBox.scrollHeight;
 
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
-        appendMessage("Error: API key is missing. Please enter your Groq API key in settings.", 'ai');
+        const errorMsg = "Error: API key is missing. Please enter your Groq API key in settings.";
+        if (isCallActive) {
+            callTranscript.push({ role: 'assistant', text: errorMsg });
+        } else {
+            appendMessage(errorMsg, 'ai');
+        }
         return;
     }
 
     try {
         const aiResponse = await fetchGroqResponse(apiKey);
-        appendMessage(aiResponse, 'ai');
-        speak(aiResponse); // Speak the AI's response
+
+        if (isCallActive) {
+            callTranscript.push({ role: 'assistant', text: aiResponse });
+        } else {
+            appendMessage(aiResponse, 'ai');
+        }
+
+        speak(aiResponse);
         conversationHistory.push({ role: 'assistant', content: aiResponse });
 
-        // Trim history to the last 3 pairs of messages (6 total)
         if (conversationHistory.length > 6) {
             conversationHistory = conversationHistory.slice(-6);
         }
     } catch (error) {
         console.error('Error fetching Groq response:', error);
-        appendMessage('Error fetching response from Groq API: ' + error.message, 'ai');
+        const errorMsg = 'Error fetching response from Groq API: ' + error.message;
+        if (isCallActive) {
+            callTranscript.push({ role: 'assistant', text: errorMsg });
+        } else {
+            appendMessage(errorMsg, 'ai');
+        }
     } finally {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -526,178 +549,321 @@ function updateApiStatus(isValid) {
     apiStatus.style.backgroundColor = isValid ? 'green' : 'red';
 }
 
-// 4. SPEECH RECOGNITION
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition;
+// 4. CALL MODE & DEEPGRAM STT
+let deepgramSocket;
+let mediaRecorder;
+let isCallActive = false;
+let isListening = false;
 
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
+// Interruption detection variables
+let currentPlayingAudio;
+let interruptionMicStream;
+let interruptionAudioContext;
+let interruptionAnimationId;
 
-    micBtn.addEventListener('click', () => {
-        isVoiceMode = !isVoiceMode;
+micBtn.addEventListener('click', () => {
+    isCallActive = !isCallActive;
+    if (isCallActive) {
+        startCall();
+    } else {
+        endCall();
+    }
+});
 
-        if (isVoiceMode) {
-            micBtn.classList.add('voice-active');
-            if (speechSynthesis.speaking) {
-                speechSynthesis.cancel();
-            }
-            if (!isRecording) {
-                recognition.start();
-            }
-        } else {
-            micBtn.classList.remove('voice-active');
-            if (isRecording) {
-                recognition.stop();
-            }
-        }
-    });
+endCallBtn.addEventListener('click', () => {
+    if (isCallActive) {
+        isCallActive = false;
+        endCall();
+    }
+});
 
-    recognition.onstart = () => {
-        isRecording = true;
-        micBtn.classList.add('recording');
-        micBtn.textContent = '...';
-    };
-
-    recognition.onend = () => {
-        isRecording = false;
-        micBtn.classList.remove('recording');
-        micBtn.innerHTML = '&#127908;';
-    };
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        userInput.value = transcript;
-        sendMessage();
-    };
-
-    recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        appendMessage(`Speech recognition error: ${event.error}`, 'ai');
-    };
-
-} else {
-    micBtn.style.display = 'none';
-    console.log("Speech Recognition not supported in this browser.");
+function updateMicStatus(status, text) {
+    if (text) {
+        callStatusText.textContent = text;
+    }
+    switch (status) {
+        case 'listening':
+            micStatus.style.backgroundColor = '#7CFC00'; // Green
+            break;
+        case 'waiting':
+            micStatus.style.backgroundColor = '#FFD700'; // Yellow
+            break;
+        case 'error':
+            micStatus.style.backgroundColor = '#FF0000'; // Red
+            break;
+        case 'off':
+        default:
+            micStatus.style.backgroundColor = '#BBB'; // Grey
+            break;
+    }
 }
 
-// 5. TEXT-TO-SPEECH (TTS)
+async function preflightCheck() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        throw new Error('Media device enumeration not supported.');
+    }
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const hasMicrophone = devices.some(device => device.kind === 'audioinput');
+    if (!hasMicrophone) {
+        throw new Error('No microphone found.');
+    }
+    // Permission will be checked by getUserMedia
+}
 
-/**
- * Speaks the given text using the browser's SpeechSynthesis API or Groq TTS API.
- * @param {string} text - The text to be spoken.
- */
-async function speak(text) {
-    if (speechSynthesis.speaking) {
-        speechSynthesis.cancel();
+async function startCall() {
+    micBtn.classList.add('voice-active');
+    callUiOverlay.classList.remove('hidden');
+    try {
+        updateMicStatus('waiting', 'Connecting...');
+        await preflightCheck();
+        listenForUser();
+    } catch (error) {
+        alert(`Could not start call: ${error.message}`);
+        console.error("Pre-flight check failed:", error);
+        updateMicStatus('error', 'Error!');
+        isCallActive = false;
+        micBtn.classList.remove('voice-active');
+        // Hide overlay after a delay so user can see the error
+        setTimeout(() => {
+            callUiOverlay.classList.add('hidden');
+            updateMicStatus('off');
+        }, 2000);
+    }
+}
+
+function renderCallTranscript() {
+    if (callTranscript.length > 0) {
+        for (const turn of callTranscript) {
+            appendMessage(turn.text, turn.role);
+        }
+        callTranscript = []; // Clear the transcript after rendering
+    }
+}
+
+function endCall() {
+    micBtn.classList.remove('voice-active');
+    callUiOverlay.classList.add('hidden');
+    updateMicStatus('off');
+    stopListening();
+    stopInterruptionDetection();
+    if (currentPlayingAudio) currentPlayingAudio.pause();
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    renderCallTranscript();
+}
+
+async function listenForUser() {
+    if (isListening) return;
+    isListening = true;
+
+    const deepgramApiKey = deepgramApiKeyInput.value.trim();
+    if (!deepgramApiKey) {
+        alert('Please enter your Deepgram API key in the settings.');
+        endCall();
+        return;
     }
 
-    if (aiTtsEnabled) {
-        const selectedProvider = aiTtsProviderSelect.value;
+    micBtn.classList.add('recording');
+    micBtn.textContent = '...';
 
-        if (selectedProvider === 'groq' && groqTtsToggle.checked) {
-            const apiKey = apiKeyInput.value.trim();
-            const model = aiTtsModelSelect.value;
-            const voice = aiTtsVoiceSelect.value;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        updateMicStatus('listening', 'Listening...');
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        const deepgramUrl = 'wss://api.deepgram.com/v1/listen?model=nova-2&interim_results=true&smart_format=true&endpointing=400';
+        deepgramSocket = new WebSocket(deepgramUrl, ['token', deepgramApiKey]);
 
-            if (!apiKey || !model || !voice) {
-                appendMessage('Groq TTS is enabled, but API Key, Model, or Voice is not selected.', 'ai');
-                return;
-            }
-
-            try {
-                const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        input: text,
-                        voice: voice
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error.message || 'Failed to generate speech.');
+        deepgramSocket.onopen = () => {
+            mediaRecorder.addEventListener('dataavailable', event => {
+                if (event.data.size > 0 && deepgramSocket.readyState === WebSocket.OPEN) {
+                    deepgramSocket.send(event.data);
                 }
+            });
+            mediaRecorder.start(250);
+        };
 
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.play();
-
-                audio.onended = () => {
-                    if (isVoiceMode) {
-                        recognition.start();
-                    }
-                };
-
-            } catch (error) {
-                console.error('Error with Groq TTS:', error);
-                appendMessage('Error generating speech from Groq: ' + error.message, 'ai');
+        let accumulatedTranscript = "";
+        deepgramSocket.onmessage = (message) => {
+            const data = JSON.parse(message.data);
+            const transcript = data.channel.alternatives[0].transcript;
+            if (transcript) {
+                accumulatedTranscript += transcript + " ";
             }
-        } else if (selectedProvider === 'deepgram') {
-            const apiKey = deepgramApiKeyInput.value.trim();
-            const voice = deepgramVoiceSelect.value;
-
-            if (!apiKey || !voice) {
-                appendMessage('Deepgram TTS is enabled, but API Key or Voice is not selected.', 'ai');
-                return;
-            }
-
-            try {
-                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Token ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: text
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.reason || 'Failed to generate speech.');
-                }
-
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.play();
-
-                audio.onended = () => {
-                    if (isVoiceMode) {
-                        recognition.start();
-                    }
-                };
-
-            } catch (error) {
-                console.error('Error with Deepgram TTS:', error);
-                appendMessage('Error generating speech from Deepgram: ' + error.message, 'ai');
-            }
-        }
-    } else if (browserTtsEnabled) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0].getAttribute('data-name');
-        const voices = speechSynthesis.getVoices();
-        const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
-
-        utterance.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
-        utterance.volume = browserTtsVolume.value / 100;
-
-        utterance.onend = () => {
-            if (isVoiceMode) {
-                recognition.start();
+            if (data.speech_final && accumulatedTranscript.trim()) {
+                userInput.value = accumulatedTranscript.trim();
+                sendMessage();
+                stopListening();
+                accumulatedTranscript = "";
             }
         };
+
+        deepgramSocket.onclose = () => { isListening = false; };
+        deepgramSocket.onerror = (error) => {
+            console.error('Deepgram WebSocket error:', error);
+            updateMicStatus('error');
+            stopListening();
+        };
+
+    } catch (error) {
+        console.error('Error accessing microphone:', error);
+        alert('Error accessing microphone. Please check your permissions.');
+        updateMicStatus('error');
+        endCall();
+    }
+}
+
+function stopListening() {
+    if (!isListening && mediaRecorder?.state === 'inactive') return;
+
+    if (isCallActive) {
+        updateMicStatus('waiting');
+    } else {
+        updateMicStatus('off');
+    }
+
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+    if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
+        deepgramSocket.close();
+    }
+    micBtn.classList.remove('recording');
+    micBtn.innerHTML = '&#127908;';
+    isListening = false;
+}
+
+// 5. TEXT-TO-SPEECH (TTS) & INTERRUPTION
+
+async function startInterruptionDetection() {
+    if (!isCallActive || interruptionAnimationId) return;
+    try {
+        interruptionMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        interruptionAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = interruptionAudioContext.createAnalyser();
+        const microphone = interruptionAudioContext.createMediaStreamSource(interruptionMicStream);
+        microphone.connect(analyser);
+        analyser.fftSize = 512;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const threshold = 30;
+        let consecutiveLoudFrames = 0;
+
+        const detect = () => {
+            analyser.getByteFrequencyData(dataArray);
+            let average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+            if (average > threshold) {
+                consecutiveLoudFrames++;
+            } else {
+                consecutiveLoudFrames = 0;
+            }
+            if (consecutiveLoudFrames > 3) {
+                if (speechSynthesis.speaking || (currentPlayingAudio && !currentPlayingAudio.paused)) {
+                    console.log("Interruption detected!");
+                    if (speechSynthesis.speaking) speechSynthesis.cancel();
+                    if (currentPlayingAudio) {
+                        currentPlayingAudio.pause();
+                        currentPlayingAudio.onended = null;
+                    }
+                    stopInterruptionDetection();
+                    if (isCallActive) listenForUser();
+                }
+            } else {
+                interruptionAnimationId = requestAnimationFrame(detect);
+            }
+        };
+        interruptionAnimationId = requestAnimationFrame(detect);
+    } catch (err) {
+        console.error("Could not start interruption detection:", err);
+    }
+}
+
+function stopInterruptionDetection() {
+    if (interruptionAnimationId) {
+        cancelAnimationFrame(interruptionAnimationId);
+        interruptionAnimationId = null;
+    }
+    if (interruptionMicStream) {
+        interruptionMicStream.getTracks().forEach(track => track.stop());
+        interruptionMicStream = null;
+    }
+    if (interruptionAudioContext && interruptionAudioContext.state !== 'closed') {
+        interruptionAudioContext.close();
+    }
+}
+
+async function speak(text) {
+    stopListening();
+    stopInterruptionDetection();
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    if (currentPlayingAudio) currentPlayingAudio.pause();
+
+    updateMicStatus('waiting', 'AI is speaking...');
+
+    const onendHandler = () => {
+        stopInterruptionDetection();
+        if (isCallActive) {
+            listenForUser();
+        }
+    };
+
+    let useFallback = false;
+    if (aiTtsEnabled) {
+        try {
+            const selectedProvider = aiTtsProviderSelect.value;
+            let audioBlob;
+
+            if (selectedProvider === 'groq' && groqTtsToggle.checked) {
+                const apiKey = apiKeyInput.value.trim();
+                const model = aiTtsModelSelect.value;
+                const voice = aiTtsVoiceSelect.value;
+                if (!apiKey || !model || !voice) throw new Error('Groq TTS is enabled, but API Key, Model, or Voice is not selected.');
+                const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model, input: text, voice })
+                });
+                if (!response.ok) throw new Error((await response.json()).error.message || 'Failed to generate speech.');
+                audioBlob = await response.blob();
+            } else if (selectedProvider === 'deepgram') {
+                const apiKey = deepgramApiKeyInput.value.trim();
+                const voice = deepgramVoiceSelect.value;
+                if (!apiKey || !voice) throw new Error('Deepgram TTS is enabled, but API Key or Voice is not selected.');
+                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
+                    method: 'POST', headers: { 'Authorization': `Token ${apiKey}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                if (!response.ok) throw new Error((await response.json()).reason || 'Failed to generate speech.');
+                audioBlob = await response.blob();
+            } else {
+                useFallback = true;
+            }
+
+            if (audioBlob) {
+                const audioUrl = URL.createObjectURL(audioBlob);
+                currentPlayingAudio = new Audio(audioUrl);
+                currentPlayingAudio.play();
+                currentPlayingAudio.onended = onendHandler;
+                startInterruptionDetection();
+                return;
+            }
+        } catch (error) {
+            console.error('Error with AI TTS:', error);
+            appendMessage('AI TTS failed: ' + error.message, 'ai');
+            useFallback = true;
+        }
+    } else {
+        useFallback = true;
+    }
+
+    if (useFallback || browserTtsEnabled) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0]?.getAttribute('data-name');
+        if (selectedVoiceName) {
+            const voices = speechSynthesis.getVoices();
+            utterance.voice = voices.find(voice => voice.name === selectedVoiceName);
+        }
+        utterance.volume = browserTtsVolume.value / 100;
+        utterance.onend = onendHandler;
         speechSynthesis.speak(utterance);
+        startInterruptionDetection();
     }
 }
 
