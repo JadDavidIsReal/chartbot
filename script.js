@@ -17,6 +17,10 @@ const browserTtsToggle = document.getElementById('browser-tts-toggle');
 const callUiOverlay = document.getElementById('call-ui-overlay');
 const endCallBtn = document.getElementById('end-call-btn');
 const callStatusText = document.getElementById('call-status-text');
+const callTimer = document.getElementById('call-timer');
+const voiceToggleBtn = document.getElementById('voice-toggle-btn');
+const aiAvatar = document.getElementById('ai-avatar');
+const liveTranscriptContainer = document.getElementById('live-transcript-container');
 const browserTtsVolume = document.getElementById('browser-tts-volume');
 const aiTtsToggle = document.getElementById('ai-tts-toggle');
 const aiTtsModelSelect = document.getElementById('ai-tts-model-select');
@@ -41,6 +45,15 @@ let isRecording = false;
 let browserTtsEnabled = false;
 let aiTtsEnabled = false;
 let systemPrompt = "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term.";
+
+// Call state variables
+let isCallActive = false;
+let isListening = false;
+let callTimerInterval;
+let callStartTime;
+
+// Visualizer variables
+let visualizerAnimationId;
 
 // 2. EVENT LISTENERS
 
@@ -323,6 +336,7 @@ async function sendMessage() {
 
     if (isCallActive) {
         callTranscript.push({ role: 'user', text: message });
+        updateLiveTranscript();
     } else {
         appendMessage(message, 'user');
     }
@@ -347,6 +361,7 @@ async function sendMessage() {
 
         if (isCallActive) {
             callTranscript.push({ role: 'assistant', text: aiResponse });
+            updateLiveTranscript();
         } else {
             appendMessage(aiResponse, 'ai');
         }
@@ -464,12 +479,29 @@ async function fetchGroqResponse(apiKey) {
  * @param {string} message - The message content.
  * @param {string} sender - The sender of the message ('user' or 'ai').
  */
-function appendMessage(message, sender) {
+function appendMessage(message, sender, container = chatBox) {
+    const isLiveTranscript = container === liveTranscriptContainer;
     const newMessage = document.createElement('div');
     newMessage.innerHTML = linkify(message.replace(/\n/g, '<br>'));
-    newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
-    chatBox.appendChild(newMessage);
-    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Add base classes and sender-specific class
+    newMessage.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+
+    // If it's for the live transcript, add a specific class for potential different styling
+    if (isLiveTranscript) {
+        newMessage.classList.add('live-transcript-bubble');
+    }
+
+    container.appendChild(newMessage);
+    container.scrollTop = container.scrollHeight;
+}
+
+function updateLiveTranscript() {
+    liveTranscriptContainer.innerHTML = ''; // Clear existing
+    const recentTurns = callTranscript.slice(-4); // Get last 4 turns
+    for (const turn of recentTurns) {
+        appendMessage(turn.text, turn.role, liveTranscriptContainer);
+    }
 }
 
 
@@ -581,6 +613,32 @@ endCallBtn.addEventListener('click', () => {
     }
 });
 
+voiceToggleBtn.addEventListener('click', () => {
+    if (!aiTtsSettings.style.display || aiTtsSettings.style.display === 'none') {
+        alert("Please unlock the Advanced Realistic Narrations in the settings menu first.");
+        return;
+    }
+
+    // This simulates a click on the *other* toggle, effectively flipping the state.
+    if (aiTtsToggle.checked) {
+        browserTtsToggle.click();
+    } else {
+        aiTtsToggle.click();
+    }
+
+    updateVoiceToggleButton();
+});
+
+function updateVoiceToggleButton() {
+    if (aiTtsToggle.checked) {
+        voiceToggleBtn.textContent = 'Use Generic Voice';
+        voiceToggleBtn.title = 'Switch to standard browser voice';
+    } else {
+        voiceToggleBtn.textContent = 'Use AI Voice';
+        voiceToggleBtn.title = 'Switch to advanced AI voice';
+    }
+}
+
 function updateMicStatus(status, text) {
     if (text) {
         callStatusText.textContent = text;
@@ -617,6 +675,17 @@ async function preflightCheck() {
 async function startCall() {
     micBtn.classList.add('voice-active');
     callUiOverlay.classList.remove('hidden');
+    updateVoiceToggleButton(); // Set initial button state
+
+    // Start timer
+    callStartTime = Date.now();
+    callTimerInterval = setInterval(() => {
+        const elapsed = Date.now() - callStartTime;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        callTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }, 1000);
+
     try {
         updateMicStatus('waiting', 'Connecting...');
         await preflightCheck();
@@ -648,11 +717,48 @@ function endCall() {
     micBtn.classList.remove('voice-active');
     callUiOverlay.classList.add('hidden');
     updateMicStatus('off');
+
+    // Stop timer
+    clearInterval(callTimerInterval);
+    callTimer.textContent = "00:00";
+
     stopListening();
     stopInterruptionDetection();
     if (currentPlayingAudio) currentPlayingAudio.pause();
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     renderCallTranscript();
+}
+
+function drawWaveform(analyser, canvasCtx, canvas) {
+    visualizerAnimationId = requestAnimationFrame(() => drawWaveform(analyser, canvasCtx, canvas));
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteTimeDomainData(dataArray);
+
+    canvasCtx.fillStyle = document.body.classList.contains('dark-mode') ? '#121212' : '#f4f4f9';
+    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasCtx.lineWidth = 2;
+    canvasCtx.strokeStyle = 'rgb(127, 255, 0)';
+    canvasCtx.beginPath();
+
+    const sliceWidth = canvas.width * 1.0 / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = v * canvas.height / 2;
+
+        if (i === 0) {
+            canvasCtx.moveTo(x, y);
+        } else {
+            canvasCtx.lineTo(x, y);
+        }
+        x += sliceWidth;
+    }
+
+    canvasCtx.lineTo(canvas.width, canvas.height / 2);
+    canvasCtx.stroke();
 }
 
 async function listenForUser() {
@@ -673,6 +779,17 @@ async function listenForUser() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         updateMicStatus('listening', 'Listening...');
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+        // Setup for visualizer
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        analyser.fftSize = 2048;
+        const canvas = document.getElementById('waveform-canvas');
+        const canvasCtx = canvas.getContext('2d');
+        drawWaveform(analyser, canvasCtx, canvas);
+
         const deepgramUrl = 'wss://api.deepgram.com/v1/listen?model=nova-2&interim_results=true&smart_format=true&endpointing=400';
         deepgramSocket = new WebSocket(deepgramUrl, ['token', deepgramApiKey]);
 
@@ -717,6 +834,12 @@ async function listenForUser() {
 
 function stopListening() {
     if (!isListening && mediaRecorder?.state === 'inactive') return;
+
+    cancelAnimationFrame(visualizerAnimationId); // Stop visualizer
+    const canvas = document.getElementById('waveform-canvas');
+    const canvasCtx = canvas.getContext('2d');
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
 
     if (isCallActive) {
         updateMicStatus('waiting');
@@ -801,8 +924,10 @@ async function speak(text) {
     if (currentPlayingAudio) currentPlayingAudio.pause();
 
     updateMicStatus('waiting', 'AI is speaking...');
+    aiAvatar.classList.add('speaking');
 
     const onendHandler = () => {
+        aiAvatar.classList.remove('speaking');
         stopInterruptionDetection();
         if (isCallActive) {
             listenForUser();
@@ -810,7 +935,7 @@ async function speak(text) {
     };
 
     let useFallback = false;
-    if (aiTtsEnabled) {
+    if (aiTtsToggle.checked) {
         try {
             const selectedProvider = aiTtsProviderSelect.value;
             let audioBlob;
@@ -857,7 +982,7 @@ async function speak(text) {
         useFallback = true;
     }
 
-    if (useFallback || browserTtsEnabled) {
+    if (useFallback || browserTtsToggle.checked) {
         const utterance = new SpeechSynthesisUtterance(text);
         const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0]?.getAttribute('data-name');
         if (selectedVoiceName) {
