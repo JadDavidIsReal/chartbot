@@ -1,23 +1,58 @@
-# Chatbot Project named CHARTBOT. BY CHART
-This project is a simple chatbot built using the Kobold AI API. It aims to provide conversational responses based on user input. I MEAN THATS THE GOAL. PROTOTYPE.
+# Project Chatbot named CHARTBOT. By Chart
+This project is a simple chatbot built using Cloud API calling. It aims to provide conversational responses based on user input.
+
+
+The link: https://jaddavidisreal.github.io/chartbot
+Portfolio Link: https://jaddavidisreal.github.io/AboutMe.github.io
+
+
+## Usage, if clone
+-To start the chatbot, open the `index.html` file in your browser and interact with the chat interface.
+-or clone & host it yourself locally. This has ZERO dependencies. Simply js/css/html.
 
 
 
+CHAT
+1. Paste the key on the left side panel.
+2. Enjoy chatting!
 
 
-## Usage
-To start the chatbot, open the `index.html` file in your browser and interact with the chat interface.
+CALL
+1. Call
+2. Talk
+3. Wait 1 sec for reply
+4. Enjoy
+#make sure your browser is supported. Too lazy to know? just use Google Chrome.
+#make sure microphone has website access
+#make sure your environment is quiet 
+
+************************************************************************************************
+SPECIAL
+Requirements: Deepgram Key
+AI Call Function
+1. Open the left side bar
+2. Scroll down to "Advanced Realistic Narration"
+3. Enter password(ask for password to Chart)
+4. Click the dropdown and choose Deepgram
+5. Paste the Deepgram Key
+6. Call
+7. Choose Realistic Voice
+8. Enjoy
 
 
+************************************************************************************************
+##Compatible API Keys:
+-OpenAI (Untested but can be called)
+-Groq
+-Deepgram
+-123123
+************************************************************************************************
 
-##Necessities:
-API Key: Kobold.AI = FDWdkGMPV_6VBfhEpomLXQ
-TTS AI API Key: TBD
-NLP Key: TBD
 
 
 ## Contact
-
-You can reach me at david.jad@icloud.com
+Message Chart
+or
+Email at david.jad@icloud.com
 
 :D
