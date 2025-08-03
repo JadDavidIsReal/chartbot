@@ -1,7 +1,7 @@
 /* General Body Styles */
 :root {
-    --primary-color: #7FFF00; /* chartreuse */
-    --dark-primary-color: #66CC00;
+    --primary-color: rgb(64, 128, 0); /* chartreuse */
+    --dark-primary-color: #272727;
     --background-light: #f4f4f9;
     --background-dark: #121212;
     --text-light: #333;
@@ -10,7 +10,7 @@
     --container-dark: #1e1e1e;
     --message-ai-light: #e5e5ea;
     --message-ai-dark: #3a3a3c;
-    --header-light: linear-gradient(to right, #7FFF00, #66CC00);
+    --header-light: linear-gradient(to right, #4f9d00, #428500);
     --header-dark: #333;
 }
 
@@ -151,7 +151,7 @@ body.dark-mode #user-input {
 }
 
 #send-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #1b590c; /* chartreuse */
     color: white;
     border: none;
     border-radius: 20px;
@@ -161,7 +161,7 @@ body.dark-mode #user-input {
 }
 
 #mic-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: #499300; /* chartreuse */
     color: white;
     border: none;
     border-radius: 20px;
