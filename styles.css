@@ -1,7 +1,7 @@
 /* General Body Styles */
 :root {
-    --primary-color: #7FFF00; /* chartreuse */
-    --dark-primary-color: #66CC00;
+    --primary-color: #2E8B57; /* SeaGreen */
+    --dark-primary-color: #256c45;
     --background-light: #f4f4f9;
     --background-dark: #121212;
     --text-light: #333;
@@ -10,7 +10,7 @@
     --container-dark: #1e1e1e;
     --message-ai-light: #e5e5ea;
     --message-ai-dark: #3a3a3c;
-    --header-light: linear-gradient(to right, #7FFF00, #66CC00);
+    --header-light: linear-gradient(to right, var(--primary-color), var(--dark-primary-color));
     --header-dark: #333;
 }
 
@@ -151,7 +151,7 @@ body.dark-mode #user-input {
 }
 
 #send-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 20px;
@@ -161,7 +161,7 @@ body.dark-mode #user-input {
 }
 
 #mic-btn {
-    background-color: #7FFF00; /* chartreuse */
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 20px;
@@ -429,16 +429,16 @@ body.dark-mode .pill-btn {
     height: 150px;
     border-radius: 50%;
     background-color: var(--primary-color);
-    box-shadow: 0 0 20px rgba(127, 255, 0, 0.5);
+    box-shadow: 0 0 20px rgba(46, 139, 87, 0.5);
 }
 .avatar.speaking {
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 20px 0 rgba(127, 255, 0, 0.5); }
-    50% { box-shadow: 0 0 35px 15px rgba(127, 255, 0, 0.7); }
-    100% { box-shadow: 0 0 20px 0 rgba(127, 255, 0, 0.5); }
+    0% { box-shadow: 0 0 20px 0 rgba(46, 139, 87, 0.5); }
+    50% { box-shadow: 0 0 35px 15px rgba(46, 139, 87, 0.7); }
+    100% { box-shadow: 0 0 20px 0 rgba(46, 139, 87, 0.5); }
 }
 
 #waveform-canvas {
