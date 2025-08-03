@@ -44,6 +44,7 @@ let callTranscript = [];
 let isRecording = false;
 let browserTtsEnabled = false;
 let aiTtsEnabled = false;
+let isSendingMessage = false;
 let systemPrompt = "You are a conversational chatbot. Your tone should be natural, friendly, and casual. Avoid being robotic or overly formal. Do not refer to yourself as an AI, a language model, or any similar term.";
 
 // Call state variables
@@ -51,6 +52,7 @@ let isCallActive = false;
 let isListening = false;
 let callTimerInterval;
 let callStartTime;
+let recognition;
 
 // Visualizer variables
 let visualizerAnimationId;
@@ -153,6 +155,9 @@ deepgramApplyBtn.addEventListener('click', async () => {
         return;
     }
 
+    deepgramApplyBtn.disabled = true;
+    deepgramApplyBtn.textContent = 'Applying...';
+
     const isValid = await testDeepgramApiKey(apiKey);
     updateDeepgramApiStatus(isValid);
 
@@ -160,6 +165,9 @@ deepgramApplyBtn.addEventListener('click', async () => {
         alert('Deepgram API Key applied successfully!');
         populateDeepgramVoices();
     }
+
+    deepgramApplyBtn.disabled = false;
+    deepgramApplyBtn.textContent = 'Apply';
 });
 
 async function testDeepgramApiKey(apiKey) {
@@ -311,6 +319,9 @@ applyApiKeyButton.addEventListener('click', async () => {
         return;
     }
 
+    applyApiKeyButton.disabled = true;
+    applyApiKeyButton.textContent = 'Applying...';
+
     const isValid = await testApiKey(apiKey);
     updateApiStatus(isValid);
 
@@ -320,6 +331,9 @@ applyApiKeyButton.addEventListener('click', async () => {
     } else {
         alert('Invalid API Key.');
     }
+
+    applyApiKeyButton.disabled = false;
+    applyApiKeyButton.textContent = 'Apply';
 });
 
 // 3. API AND CHAT FUNCTIONS
@@ -360,6 +374,8 @@ async function initializeApp() {
  * Sends a message to the Groq API and displays the response.
  */
 async function sendMessage() {
+    if (isSendingMessage) return;
+
     const message = userInput.value.trim();
     if (!message) return;
 
@@ -369,54 +385,60 @@ async function sendMessage() {
         return;
     }
 
-    if (isCallActive) {
-        callTranscript.push({ role: 'user', text: message });
-        updateLiveTranscript();
-    } else {
-        appendMessage(message, 'user');
-    }
-
-    conversationHistory.push({ role: 'user', content: message });
-    userInput.value = '';
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    const apiKey = apiKeyInput.value.trim();
-    if (!apiKey) {
-        const errorMsg = "Error: API key is missing. Please enter your Groq API key in settings.";
-        if (isCallActive) {
-            callTranscript.push({ role: 'assistant', text: errorMsg });
-        } else {
-            appendMessage(errorMsg, 'ai');
-        }
-        return;
-    }
+    isSendingMessage = true;
+    sendBtn.disabled = true;
 
     try {
-        const aiResponse = await fetchGroqResponse(apiKey);
-
         if (isCallActive) {
-            callTranscript.push({ role: 'assistant', text: aiResponse });
+            callTranscript.push({ role: 'user', text: message });
             updateLiveTranscript();
         } else {
-            appendMessage(aiResponse, 'ai');
+            appendMessage(message, 'user');
         }
 
-        speak(aiResponse);
-        conversationHistory.push({ role: 'assistant', content: aiResponse });
+        conversationHistory.push({ role: 'user', content: message });
+        userInput.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-        if (conversationHistory.length > 6) {
-            conversationHistory = conversationHistory.slice(-6);
-        }
-    } catch (error) {
-        console.error('Error fetching Groq response:', error);
-        const errorMsg = 'Error fetching response from Groq API: ' + error.message;
-        if (isCallActive) {
-            callTranscript.push({ role: 'assistant', text: errorMsg });
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            const errorMsg = "Error: API key is missing. Please enter your Groq API key in settings.";
+            if (isCallActive) {
+                callTranscript.push({ role: 'assistant', text: errorMsg });
+            } else {
+                appendMessage(errorMsg, 'ai');
+            }
         } else {
-            appendMessage(errorMsg, 'ai');
+            try {
+                const aiResponse = await fetchGroqResponse(apiKey);
+
+                if (isCallActive) {
+                    callTranscript.push({ role: 'assistant', text: aiResponse });
+                    updateLiveTranscript();
+                } else {
+                    appendMessage(aiResponse, 'ai');
+                }
+
+                speak(aiResponse);
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
+
+                if (conversationHistory.length > 6) {
+                    conversationHistory = conversationHistory.slice(-6);
+                }
+            } catch (error) {
+                console.error('Error fetching Groq response:', error);
+                const errorMsg = 'Error fetching response from Groq API: ' + error.message;
+                if (isCallActive) {
+                    callTranscript.push({ role: 'assistant', text: errorMsg });
+                } else {
+                    appendMessage(errorMsg, 'ai');
+                }
+            }
         }
     } finally {
         chatBox.scrollTop = chatBox.scrollHeight;
+        isSendingMessage = false;
+        sendBtn.disabled = false;
     }
 }
 
@@ -747,15 +769,17 @@ function drawWaveform(analyser, canvasCtx, canvas) {
 }
 
 async function listenForUser() {
+    const deepgramApiKey = deepgramApiKeyInput.value.trim();
+    if (deepgramApiKey) {
+        await listenWithDeepgram(deepgramApiKey);
+    } else {
+        await listenWithWebSpeech();
+    }
+}
+
+async function listenWithDeepgram(deepgramApiKey) {
     if (isListening) return;
     isListening = true;
-
-    const deepgramApiKey = deepgramApiKeyInput.value.trim();
-    if (!deepgramApiKey) {
-        alert('Please enter your Deepgram API key in the settings.');
-        endCall();
-        return;
-    }
 
     micBtn.classList.add('recording');
     micBtn.textContent = '...';
@@ -765,7 +789,6 @@ async function listenForUser() {
         updateMicStatus('listening', 'Listening...');
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
-        // Setup for visualizer
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioContext.createAnalyser();
         const microphone = audioContext.createMediaStreamSource(stream);
@@ -794,9 +817,11 @@ async function listenForUser() {
             if (transcript) {
                 accumulatedTranscript += transcript + " ";
             }
-            if (data.speech_final && accumulatedTranscript.trim()) {
-                userInput.value = accumulatedTranscript.trim();
-                sendMessage();
+            if (data.speech_final) {
+                if (accumulatedTranscript.trim()) {
+                    userInput.value = accumulatedTranscript.trim();
+                    sendMessage();
+                }
                 stopListening();
                 accumulatedTranscript = "";
             }
@@ -817,14 +842,82 @@ async function listenForUser() {
     }
 }
 
-function stopListening() {
-    if (!isListening && mediaRecorder?.state === 'inactive') return;
+async function listenWithWebSpeech() {
+    if (isListening) return;
 
-    cancelAnimationFrame(visualizerAnimationId); // Stop visualizer
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Your browser does not support the Web Speech API. Please use a different browser or enter a Deepgram API key to use the call feature.");
+        endCall();
+        return;
+    }
+
+    isListening = true;
+    micBtn.classList.add('recording');
+    micBtn.textContent = '...';
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim();
+        if (transcript) {
+            userInput.value = transcript;
+            sendMessage();
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        stopListening();
+        if ((event.error === 'no-speech' || event.error === 'audio-capture') && isCallActive) {
+            listenForUser();
+        } else if (event.error !== 'aborted') {
+            alert(`Speech recognition error: ${event.error}`);
+            endCall();
+        }
+    };
+
+    recognition.onend = () => {
+        if (isListening) {
+            stopListening();
+            if (isCallActive) listenForUser();
+        }
+    };
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        updateMicStatus('listening', 'Listening...');
+        mediaRecorder = new MediaRecorder(stream); // Use to hold stream for stopListening
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        analyser.fftSize = 2048;
+        const canvas = document.getElementById('waveform-canvas');
+        const canvasCtx = canvas.getContext('2d');
+        drawWaveform(analyser, canvasCtx, canvas);
+
+        recognition.start();
+
+    } catch (error) {
+        console.error('Error accessing microphone:', error);
+        alert('Error accessing microphone. Please check your permissions.');
+        updateMicStatus('error');
+        endCall();
+    }
+}
+
+function stopListening() {
+    if (!isListening) return;
+
+    cancelAnimationFrame(visualizerAnimationId);
     const canvas = document.getElementById('waveform-canvas');
     const canvasCtx = canvas.getContext('2d');
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
+    if(canvasCtx) canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (isCallActive) {
         updateMicStatus('waiting');
@@ -834,11 +927,20 @@ function stopListening() {
 
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
+    }
+    if (mediaRecorder && mediaRecorder.stream) {
         mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
+
     if (deepgramSocket && deepgramSocket.readyState === WebSocket.OPEN) {
         deepgramSocket.close();
     }
+
+    if (recognition) {
+        recognition.abort();
+        recognition = null;
+    }
+
     micBtn.classList.remove('recording');
     micBtn.innerHTML = '&#127908;';
     isListening = false;
