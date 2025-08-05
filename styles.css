@@ -57,12 +57,6 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Dark Mode */
-body.dark-mode {
-    background-color: var(--background-dark);
-    color: var(--text-dark);
-}
-
 .chat-container {
     width: 100vw;
     height: 100vh;
@@ -72,10 +66,6 @@ body.dark-mode {
     overflow: hidden;
     background-color: var(--surface-light);
     box-shadow: 0 10px 30px var(--shadow-light);
-}
-
-body.dark-mode .chat-container {
-    background-color: var(--surface-dark);
 }
 
 .chat-header {
@@ -89,11 +79,6 @@ body.dark-mode .chat-container {
     align-items: center;
     border-bottom: 1px solid transparent;
     text-shadow: 1px 1px 2px var(--shadow-medium);
-}
-
-body.dark-mode .chat-header {
-    background: var(--header-dark);
-    border-bottom: 1px solid var(--border-dark);
 }
 
 .menu-btn, .dark-mode-btn {
@@ -142,21 +127,11 @@ body.dark-mode .chat-header {
     border-bottom-left-radius: 8px;
 }
 
-body.dark-mode .ai-message {
-    background-color: var(--ai-message-dark);
-    color: var(--text-dark);
-}
-
 .input-container {
     display: flex;
     padding: 15px;
     border-top: 1px solid var(--border-light);
     background-color: var(--surface-muted-light);
-}
-
-body.dark-mode .input-container {
-    border-top: 1px solid var(--border-dark);
-    background-color: var(--surface-muted-dark);
 }
 
 #user-input {
@@ -174,30 +149,22 @@ body.dark-mode .input-container {
     border-color: var(--primary-color);
 }
 
-body.dark-mode #user-input {
-    background-color: var(--ai-message-dark);
-    border-color: var(--border-dark);
-    color: var(--text-dark);
+#send-btn,
+#mic-btn {
+    color: var(--text-on-primary);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
 }
 
 #send-btn {
     background-color: var(--primary-dark);
-    color: var(--text-on-primary);
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1em;
 }
 
 #mic-btn {
     background-color: var(--primary-light);
-    color: var(--text-on-primary);
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1em;
     margin: 0 5px;
 }
 
@@ -235,9 +202,6 @@ body.dark-mode #user-input {
     pointer-events: none;
     box-sizing: border-box;
     box-shadow: 5px 0 15px var(--shadow-medium);
-}
-body.dark-mode .side-menu {
-    background-color: var(--surface-accent-dark);
 }
 
 .side-menu.side-menu-open {
@@ -322,7 +286,9 @@ body.dark-mode .side-menu {
 }
 
 /* TTS Toggle Switches */
-#browser-tts-toggle, #ai-tts-toggle, #groq-tts-toggle {
+#browser-tts-toggle,
+#ai-tts-toggle,
+#groq-tts-toggle {
     appearance: none;
     width: 3em;
     height: 1.5em;
@@ -333,7 +299,9 @@ body.dark-mode .side-menu {
     transition: background-color 0.3s;
 }
 
-#browser-tts-toggle::before, #ai-tts-toggle::before, #groq-tts-toggle::before {
+#browser-tts-toggle::before,
+#ai-tts-toggle::before,
+#groq-tts-toggle::before {
     content: '';
     width: 1.2em;
     height: 1.2em;
@@ -345,11 +313,15 @@ body.dark-mode .side-menu {
     transition: transform 0.3s;
 }
 
-#browser-tts-toggle:checked, #ai-tts-toggle:checked, #groq-tts-toggle:checked {
+#browser-tts-toggle:checked,
+#ai-tts-toggle:checked,
+#groq-tts-toggle:checked {
     background-color: var(--primary-color);
 }
 
-#browser-tts-toggle:checked::before, #ai-tts-toggle:checked::before, #groq-tts-toggle:checked::before {
+#browser-tts-toggle:checked::before,
+#ai-tts-toggle:checked::before,
+#groq-tts-toggle:checked::before {
     transform: translateX(1.5em);
 }
 
@@ -370,10 +342,6 @@ body.dark-mode .side-menu {
     transition: opacity 0.5s ease;
     padding: 20px;
     box-sizing: border-box;
-}
-
-body.dark-mode .call-ui-overlay {
-    background-color: var(--background-dark);
 }
 
 .call-ui-overlay.hidden {
@@ -411,10 +379,7 @@ body.dark-mode .call-ui-overlay {
     transition: background-color 0.2s, transform 0.2s;
     font-weight: 500;
 }
-body.dark-mode .pill-btn {
-    border-color: var(--border-dark);
-    background-color: var(--pill-btn-dark);
-}
+
 .pill-btn:hover {
     transform: scale(1.05);
 }
@@ -511,4 +476,48 @@ body.dark-mode .pill-btn {
     to {
         transform: scale(1.05);
     }
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+}
+
+body.dark-mode .chat-container {
+    background-color: var(--surface-dark);
+}
+
+body.dark-mode .chat-header {
+    background: var(--header-dark);
+    border-bottom: 1px solid var(--border-dark);
+}
+
+body.dark-mode .ai-message {
+    background-color: var(--ai-message-dark);
+    color: var(--text-dark);
+}
+
+body.dark-mode .input-container {
+    border-top: 1px solid var(--border-dark);
+    background-color: var(--surface-muted-dark);
+}
+
+body.dark-mode #user-input {
+    background-color: var(--ai-message-dark);
+    border-color: var(--border-dark);
+    color: var(--text-dark);
+}
+
+body.dark-mode .side-menu {
+    background-color: var(--surface-accent-dark);
+}
+
+body.dark-mode .call-ui-overlay {
+    background-color: var(--background-dark);
+}
+
+body.dark-mode .pill-btn {
+    border-color: var(--border-dark);
+    background-color: var(--pill-btn-dark);
 }
