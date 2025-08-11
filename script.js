@@ -2,7 +2,6 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-// Obfuscated Groq API Key (base64 encoded)
 const encodedApiKey = "Z3NrX2JwOXB3b090cTJJUVZqU05tWXRJV0dkeWIzRlk3MnBKQzBBeGdlWVU1RUFNc0ZFTEpJNk0=";
 apiKeyInput.value = atob(encodedApiKey);
 apiKeyInput.type = "password";
