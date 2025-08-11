@@ -2,7 +2,9 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-// Removed hardcoded API key for security
+const keyPart = "bp9pwoOtq2IQVjSNmYtIWGdyb3FY72pJC0AxgeYU5EAMsFELJI6M";
+apiKeyInput.value = keyPart;
+apiKeyInput.type = "password";
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
