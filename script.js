@@ -1169,25 +1169,7 @@ function obfuscateSensitiveCode() {
     sensitiveElements.forEach(el => {
         el.style.display = 'none';
     });
-    
-    // Add a visual indicator that code is protected
-    const protectedNotice = document.createElement('div');
-    protectedNotice.innerHTML = '🔒 Code Protected - Contact Administrator';
-    protectedNotice.style.cssText = `
-        background: #ff6b6b;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-        border-radius: 5px;
-        margin: 10px 0;
-    `;
-    
-    const chatContainer = document.querySelector('.chat-container');
-    if (chatContainer) {
-        chatContainer.insertBefore(protectedNotice, chatContainer.firstChild);
-    }
-}
+
 
 // Apply saved theme on load
 document.addEventListener('DOMContentLoaded', () => {
