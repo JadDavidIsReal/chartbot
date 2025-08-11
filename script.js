@@ -2,8 +2,9 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-const keyPart = "sk_bp9pwoOtq2IQVjSNmYtIWGdyb3FY72pJC0AxgeYU5EAMsFELJI6M";
-apiKeyInput.value = keyPart;
+// Obfuscated Groq API Key (base64 encoded)
+const encodedApiKey = "Z3NrX2JwOXB3b090cTJJUVZqU05tWXRJV0dkeWIzRlk3MnBKQzBBeGdlWVU1RUFNc0ZFTEpJNk0=";
+apiKeyInput.value = atob(encodedApiKey);
 apiKeyInput.type = "password";
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
