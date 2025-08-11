@@ -2,7 +2,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const apiKeyInput = document.getElementById('api-key');
-apiKeyInput.value = "dd";
+// Removed hardcoded API key for security
 const apiStatus = document.getElementById('api-status');
 const applyApiKeyButton = document.getElementById('apply-btn');
 const modelSelect = document.getElementById('model-select');
@@ -37,6 +37,15 @@ const deepgramApiKeyInput = document.getElementById('deepgram-api-key');
 const deepgramApiStatus = document.getElementById('deepgram-api-status');
 const deepgramApplyBtn = document.getElementById('deepgram-apply-btn');
 const deepgramVoiceSelect = document.getElementById('deepgram-voice-select');
+
+// Constants for magic strings
+const ROLE_AI = 'ai';
+const ROLE_USER = 'user';
+const ROLE_SYSTEM = 'system';
+const STATUS_LISTENING = 'listening';
+const STATUS_WAITING = 'waiting';
+const STATUS_ERROR = 'error';
+const STATUS_OFF = 'off';
 
 // Gloabl variables
 let conversationHistory = [];
@@ -232,7 +241,6 @@ function populateBrowserTtsVoices() {
 
 speechSynthesis.onvoiceschanged = populateBrowserTtsVoices;
 
-
 const groqTtsVoices = {
     'playai-tts': [
         'Arista-PlayAI', 'Atlas-PlayAI', 'Basil-PlayAI', 'Briggs-PlayAI', 'Calum-PlayAI',
@@ -248,7 +256,6 @@ const groqTtsVoices = {
 function populateAiTtsModels() {
     aiTtsModelSelect.innerHTML = '';
     const models = Object.keys(groqTtsVoices);
-
 
     models.forEach(model => {
         const option = document.createElement('option');
@@ -283,10 +290,11 @@ aiTtsUnlockBtn.addEventListener('click', () => {
 });
 
 // Send message on button click or Enter key
-sendBtn.addEventListener('click', sendMessage);
+const debouncedSendMessage = debounce(sendMessage, 300);
+sendBtn.addEventListener('click', debouncedSendMessage);
 userInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
-        sendMessage();
+        debouncedSendMessage();
         event.preventDefault();
     }
 });
@@ -367,7 +375,7 @@ async function initializeApp() {
             await fetchAndDisplayModels(apiKey);
         }
     }
-    appendMessage("Welcome to Chartbot! Type `/help` to see available commands.", 'ai');
+    appendMessage("Welcome to Chartbot! Type `/help` to see available commands.", ROLE_AI);
 }
 
 /**
@@ -386,17 +394,17 @@ async function sendMessage() {
     }
 
     isSendingMessage = true;
-    sendBtn.disabled = true;
+    showLoadingState(true);
 
     try {
         if (isCallActive) {
-            callTranscript.push({ role: 'user', text: message });
+            callTranscript.push({ role: ROLE_USER, text: message });
             updateLiveTranscript();
         } else {
-            appendMessage(message, 'user');
+            appendMessage(message, ROLE_USER);
         }
 
-        conversationHistory.push({ role: 'user', content: message });
+        conversationHistory.push({ role: ROLE_USER, content: message });
         userInput.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -404,38 +412,39 @@ async function sendMessage() {
         if (!apiKey) {
             const errorMsg = "Error: API key is missing. Please enter your Groq API key in settings.";
             if (isCallActive) {
-                callTranscript.push({ role: 'assistant', text: errorMsg });
+                callTranscript.push({ role: ROLE_AI, text: errorMsg });
             } else {
-                appendMessage(errorMsg, 'ai');
+                appendMessage(errorMsg, ROLE_AI);
             }
         } else {
             try {
                 const aiResponse = await fetchGroqResponse(apiKey);
 
                 if (isCallActive) {
-                    callTranscript.push({ role: 'assistant', text: aiResponse });
+                    callTranscript.push({ role: ROLE_AI, text: aiResponse });
                     updateLiveTranscript();
                 } else {
-                    appendMessage(aiResponse, 'ai');
+                    appendMessage(aiResponse, ROLE_AI);
                 }
 
                 speak(aiResponse);
-                conversationHistory.push({ role: 'assistant', content: aiResponse });
+                conversationHistory.push({ role: ROLE_AI, content: aiResponse });
 
                 if (conversationHistory.length > 6) {
                     conversationHistory = conversationHistory.slice(-6);
                 }
             } catch (error) {
-                console.error('Error fetching Groq response:', error);
+                log('Error fetching Groq response: ' + error.message, 'error');
                 const errorMsg = 'Error fetching response from Groq API: ' + error.message;
                 if (isCallActive) {
-                    callTranscript.push({ role: 'assistant', text: errorMsg });
+                    callTranscript.push({ role: ROLE_AI, text: errorMsg });
                 } else {
-                    appendMessage(errorMsg, 'ai');
+                    appendMessage(errorMsg, ROLE_AI);
                 }
             }
         }
     } finally {
+        showLoadingState(false);
         chatBox.scrollTop = chatBox.scrollHeight;
         isSendingMessage = false;
         sendBtn.disabled = false;
@@ -482,16 +491,16 @@ function handleCommand(command) {
                 <strong>Available Commands:</strong><br>
                 <code>/help</code> - Shows this help message.<br>
                 <code>/clear</code> - Clears the chat history.<br>
-                <code>/theme &lt;color&gt;</code> - Changes the theme color. Available colors: <code>chartreuse</code>, <code>blue</code>, <code>red</code>, <code>purple</code>.<br>
-                <code>/system &lt;prompt&gt;</code> - Sets a new system prompt.<br>
+                <code>/theme <color></code> - Changes the theme color. Available colors: <code>chartreuse</code>, <code>blue</code>, <code>red</code>, <code>purple</code>.<br>
+                <code>/system <prompt></code> - Sets a new system prompt.<br>
                 <code>/history</code> - Displays the current conversation history.
             `;
-            appendMessage(helpMessage, 'ai');
+            appendMessage(helpMessage, ROLE_AI);
             break;
         case '/clear':
             chatBox.innerHTML = '';
             conversationHistory = [];
-            appendMessage('Chat history cleared.', 'ai');
+            appendMessage('Chat history cleared.', ROLE_AI);
             break;
         case '/theme':
             const validColors = ['chartreuse', 'blue', 'red', 'purple'];
@@ -503,28 +512,27 @@ function handleCommand(command) {
                     'purple': '#6f42c1'
                 };
                 document.documentElement.style.setProperty('--primary-color', colorMap[argument]);
-                appendMessage(`Theme color changed to ${argument}.`, 'ai');
+                appendMessage(`Theme color changed to ${argument}.`, ROLE_AI);
             } else {
-                appendMessage(`Invalid color. Available colors: ${validColors.join(', ')}.`, 'ai');
+                appendMessage(`Invalid color. Available colors: ${validColors.join(', ')}.`, ROLE_AI);
             }
             break;
         case '/system':
             if (argument) {
                 systemPrompt = argument;
-                appendMessage(`System prompt updated to: "${argument}"`, 'ai');
+                appendMessage(`System prompt updated to: "${argument}"`, ROLE_AI);
             } else {
-                appendMessage('Please provide a system prompt.', 'ai');
+                appendMessage('Please provide a system prompt.', ROLE_AI);
             }
             break;
         case '/history':
             const historyMessage = conversationHistory.map(msg => `<strong>${msg.role}:</strong> ${msg.content}`).join('<br>');
-            appendMessage(historyMessage || 'No history yet.', 'ai');
+            appendMessage(historyMessage || 'No history yet.', ROLE_AI);
             break;
         default:
-            appendMessage(`Unknown command: ${cmd}`, 'ai');
+            appendMessage(`Unknown command: ${cmd}`, ROLE_AI);
     }
 }
-
 
 /**
  * Fetches a response from the Groq API.
@@ -534,7 +542,7 @@ function handleCommand(command) {
 async function fetchGroqResponse(apiKey) {
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const messagesWithSystemPrompt = [{ role: 'system', content: systemPrompt }, ...conversationHistory];
+    const messagesWithSystemPrompt = [{ role: ROLE_SYSTEM, content: systemPrompt }, ...conversationHistory];
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -549,8 +557,8 @@ async function fetchGroqResponse(apiKey) {
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Ask for the key from Chart.`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Groq API Error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await response.json();
@@ -565,11 +573,10 @@ async function fetchGroqResponse(apiKey) {
 function appendMessage(message, sender) {
     const newMessage = document.createElement('div');
     newMessage.innerHTML = linkify(message.replace(/\n/g, '<br>'));
-    newMessage.className = sender === 'user' ? 'user-message' : 'ai-message';
+    newMessage.className = sender === ROLE_USER ? 'user-message' : 'ai-message';
     chatBox.appendChild(newMessage);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
 
 function linkify(text) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -619,7 +626,7 @@ async function fetchAndDisplayModels(apiKey) {
         }
 
     } catch (error) {
-        console.error('Error fetching models:', error);
+        log('Error fetching models: ' + error.message, 'error');
         alert('Error fetching models: ' + error.message);
     }
 }
@@ -660,16 +667,16 @@ function updateMicStatus(status, text) {
         callStatusText.textContent = text;
     }
     switch (status) {
-        case 'listening':
+        case STATUS_LISTENING:
             micStatus.style.backgroundColor = '#7CFC00'; // Green
             break;
-        case 'waiting':
+        case STATUS_WAITING:
             micStatus.style.backgroundColor = '#FFD700'; // Yellow
             break;
-        case 'error':
+        case STATUS_ERROR:
             micStatus.style.backgroundColor = '#FF0000'; // Red
             break;
-        case 'off':
+        case STATUS_OFF:
         default:
             micStatus.style.backgroundColor = '#BBB'; // Grey
             break;
@@ -703,19 +710,19 @@ async function startCall() {
     }, 1000);
 
     try {
-        updateMicStatus('waiting', 'Connecting...');
+        updateMicStatus(STATUS_WAITING, 'Connecting...');
         await preflightCheck();
         listenForUser();
     } catch (error) {
         alert(`Could not start call: ${error.message}`);
-        console.error("Pre-flight check failed:", error);
-        updateMicStatus('error', 'Error!');
+        log("Pre-flight check failed: " + error, 'error');
+        updateMicStatus(STATUS_ERROR, 'Error!');
         isCallActive = false;
         micBtn.classList.remove('voice-active');
         // Hide overlay after a delay so user can see the error
         setTimeout(() => {
             callUiOverlay.classList.add('hidden');
-            updateMicStatus('off');
+            updateMicStatus(STATUS_OFF);
         }, 2000);
     }
 }
@@ -723,7 +730,7 @@ async function startCall() {
 function endCall() {
     micBtn.classList.remove('voice-active');
     callUiOverlay.classList.add('hidden');
-    updateMicStatus('off');
+    updateMicStatus(STATUS_OFF);
 
     // Stop timer
     clearInterval(callTimerInterval);
@@ -786,7 +793,7 @@ async function listenWithDeepgram(deepgramApiKey) {
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        updateMicStatus('listening', 'Listening...');
+        updateMicStatus(STATUS_LISTENING, 'Listening...');
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -829,15 +836,15 @@ async function listenWithDeepgram(deepgramApiKey) {
 
         deepgramSocket.onclose = () => { isListening = false; };
         deepgramSocket.onerror = (error) => {
-            console.error('Deepgram WebSocket error:', error);
-            updateMicStatus('error');
+            log('Deepgram WebSocket error: ' + error, 'error');
+            updateMicStatus(STATUS_ERROR);
             stopListening();
         };
 
     } catch (error) {
-        console.error('Error accessing microphone:', error);
+        log('Error accessing microphone: ' + error, 'error');
         alert('Error accessing microphone. Please check your permissions.');
-        updateMicStatus('error');
+        updateMicStatus(STATUS_ERROR);
         endCall();
     }
 }
@@ -870,7 +877,7 @@ async function listenWithWebSpeech() {
     };
 
     recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
+        log('Speech recognition error: ' + event.error, 'error');
         stopListening();
         if ((event.error === 'no-speech' || event.error === 'audio-capture') && isCallActive) {
             listenForUser();
@@ -889,7 +896,7 @@ async function listenWithWebSpeech() {
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        updateMicStatus('listening', 'Listening...');
+        updateMicStatus(STATUS_LISTENING, 'Listening...');
         mediaRecorder = new MediaRecorder(stream); // Use to hold stream for stopListening
 
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -904,9 +911,9 @@ async function listenWithWebSpeech() {
         recognition.start();
 
     } catch (error) {
-        console.error('Error accessing microphone:', error);
+        log('Error accessing microphone: ' + error, 'error');
         alert('Error accessing microphone. Please check your permissions.');
-        updateMicStatus('error');
+        updateMicStatus(STATUS_ERROR);
         endCall();
     }
 }
@@ -920,9 +927,9 @@ function stopListening() {
     if(canvasCtx) canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (isCallActive) {
-        updateMicStatus('waiting');
+        updateMicStatus(STATUS_WAITING);
     } else {
-        updateMicStatus('off');
+        updateMicStatus(STATUS_OFF);
     }
 
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
@@ -971,7 +978,7 @@ async function startInterruptionDetection() {
             }
             if (consecutiveLoudFrames > 3) {
                 if (speechSynthesis.speaking || (currentPlayingAudio && !currentPlayingAudio.paused)) {
-                    console.log("Interruption detected!");
+                    log("Interruption detected!");
                     if (speechSynthesis.speaking) speechSynthesis.cancel();
                     if (currentPlayingAudio) {
                         currentPlayingAudio.pause();
@@ -986,7 +993,7 @@ async function startInterruptionDetection() {
         };
         interruptionAnimationId = requestAnimationFrame(detect);
     } catch (err) {
-        console.error("Could not start interruption detection:", err);
+        log("Could not start interruption detection: " + err, 'error');
     }
 }
 
@@ -1004,13 +1011,118 @@ function stopInterruptionDetection() {
     }
 }
 
+// Utility functions
+function log(msg, level = 'log') {
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        console[level](msg);
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function showLoadingState(isLoading) {
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = isLoading ? 'block' : 'none';
+    }
+    
+    // Disable send button during loading
+    sendBtn.disabled = isLoading;
+    
+    // Show typing indicator
+    if (isLoading) {
+        appendMessage('<em>AI is typing...</em>', ROLE_AI);
+    }
+}
+
+function setupTtsHandlers(onendHandler) {
+    return {
+        onEnd: onendHandler,
+        onError: (error) => {
+            log(`TTS Error: ${error}`, 'error');
+            onendHandler();
+        }
+    };
+}
+
+function playBrowserTts(text, handlers) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0]?.getAttribute('data-name');
+    
+    if (selectedVoiceName) {
+        const voices = speechSynthesis.getVoices();
+        utterance.voice = voices.find(voice => voice.name === selectedVoiceName);
+    }
+    
+    utterance.volume = browserTtsVolume.value / 100;
+    utterance.onend = handlers.onEnd;
+    utterance.onerror = handlers.onError;
+    
+    speechSynthesis.speak(utterance);
+    startInterruptionDetection();
+}
+
+async function playAiTts(text, handlers) {
+    try {
+        const selectedProvider = aiTtsProviderSelect.value;
+        let audioBlob;
+
+        if (selectedProvider === 'groq' && groqTtsToggle.checked) {
+            const apiKey = apiKeyInput.value.trim();
+            const model = aiTtsModelSelect.value;
+            const voice = aiTtsVoiceSelect.value;
+            if (!apiKey || !model || !voice) throw new Error('Groq TTS is enabled, but API Key, Model, or Voice is not selected.');
+            const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+                method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model, input: text, voice })
+            });
+            if (!response.ok) throw new Error((await response.json()).error.message || 'Failed to generate speech.');
+            audioBlob = await response.blob();
+        } else if (selectedProvider === 'deepgram') {
+            const apiKey = deepgramApiKeyInput.value.trim();
+            const voice = deepgramVoiceSelect.value;
+            if (!apiKey || !voice) throw new Error('Deepgram TTS is enabled, but API Key or Voice is not selected.');
+            const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
+                method: 'POST', headers: { 'Authorization': `Token ${apiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            if (!response.ok) throw new Error((await response.json()).reason || 'Failed to generate speech.');
+            audioBlob = await response.blob();
+        } else {
+            throw new Error('No valid TTS provider selected');
+        }
+
+        if (audioBlob) {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            currentPlayingAudio = new Audio(audioUrl);
+            currentPlayingAudio.onended = handlers.onEnd;
+            currentPlayingAudio.onerror = handlers.onError;
+            currentPlayingAudio.play();
+            startInterruptionDetection();
+        }
+    } catch (error) {
+        log('Error with AI TTS: ' + error, 'error');
+        throw error;
+    }
+}
+
 async function speak(text) {
     stopListening();
     stopInterruptionDetection();
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     if (currentPlayingAudio) currentPlayingAudio.pause();
 
-    updateMicStatus('waiting', 'AI is speaking...');
+    updateMicStatus(STATUS_WAITING, 'AI is speaking...');
     aiAvatar.classList.add('speaking');
 
     const onendHandler = () => {
@@ -1021,48 +1133,15 @@ async function speak(text) {
         }
     };
 
+    const handlers = setupTtsHandlers(onendHandler);
+
     let useFallback = false;
     if (aiTtsToggle.checked) {
         try {
-            const selectedProvider = aiTtsProviderSelect.value;
-            let audioBlob;
-
-            if (selectedProvider === 'groq' && groqTtsToggle.checked) {
-                const apiKey = apiKeyInput.value.trim();
-                const model = aiTtsModelSelect.value;
-                const voice = aiTtsVoiceSelect.value;
-                if (!apiKey || !model || !voice) throw new Error('Groq TTS is enabled, but API Key, Model, or Voice is not selected.');
-                const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
-                    method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model, input: text, voice })
-                });
-                if (!response.ok) throw new Error((await response.json()).error.message || 'Failed to generate speech.');
-                audioBlob = await response.blob();
-            } else if (selectedProvider === 'deepgram') {
-                const apiKey = deepgramApiKeyInput.value.trim();
-                const voice = deepgramVoiceSelect.value;
-                if (!apiKey || !voice) throw new Error('Deepgram TTS is enabled, but API Key or Voice is not selected.');
-                const response = await fetch(`https://api.deepgram.com/v1/speak?model=${voice}`, {
-                    method: 'POST', headers: { 'Authorization': `Token ${apiKey}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                if (!response.ok) throw new Error((await response.json()).reason || 'Failed to generate speech.');
-                audioBlob = await response.blob();
-            } else {
-                useFallback = true;
-            }
-
-            if (audioBlob) {
-                const audioUrl = URL.createObjectURL(audioBlob);
-                currentPlayingAudio = new Audio(audioUrl);
-                currentPlayingAudio.play();
-                currentPlayingAudio.onended = onendHandler;
-                startInterruptionDetection();
-                return;
-            }
+            await playAiTts(text, handlers);
+            return;
         } catch (error) {
-            console.error('Error with AI TTS:', error);
-            appendMessage('AI TTS failed: ' + error.message, 'ai');
+            log('AI TTS failed: ' + error.message, 'error');
             useFallback = true;
         }
     } else {
@@ -1070,21 +1149,76 @@ async function speak(text) {
     }
 
     if (useFallback || browserTtsToggle.checked) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoiceName = browserTtsVoiceSelect.selectedOptions[0]?.getAttribute('data-name');
-        if (selectedVoiceName) {
-            const voices = speechSynthesis.getVoices();
-            utterance.voice = voices.find(voice => voice.name === selectedVoiceName);
-        }
-        utterance.volume = browserTtsVolume.value / 100;
-        utterance.onend = onendHandler;
-        speechSynthesis.speak(utterance);
-        startInterruptionDetection();
+        playBrowserTts(text, handlers);
+    }
+}
+
+// Security functions
+function hideApiKeyInput() {
+    const apiKeyContainer = document.querySelector('.api-key-container');
+    if (apiKeyContainer) {
+        apiKeyContainer.style.display = 'none';
+    }
+}
+
+function obfuscateSensitiveCode() {
+    // Hide any elements that might show sensitive code
+    const sensitiveElements = document.querySelectorAll('.sensitive-code');
+    sensitiveElements.forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Add a visual indicator that code is protected
+    const protectedNotice = document.createElement('div');
+    protectedNotice.innerHTML = '🔒 Code Protected - Contact Administrator';
+    protectedNotice.style.cssText = `
+        background: #ff6b6b;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        border-radius: 5px;
+        margin: 10px 0;
+    `;
+    
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+        chatContainer.insertBefore(protectedNotice, chatContainer.firstChild);
     }
 }
 
 // Apply saved theme on load
 document.addEventListener('DOMContentLoaded', () => {
+    // Hide API key input container
+    hideApiKeyInput();
+    
+    // Obfuscate sensitive code displays
+    obfuscateSensitiveCode();
+    
+    // Disable text selection and right-click for security
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+    
+    // Disable right-click
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
+    
+    // Disable common developer tools shortcuts
+    document.addEventListener('keydown', (e) => {
+        // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+        if (
+            e.keyCode === 123 || 
+            (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+            (e.ctrlKey && e.keyCode === 85)
+        ) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
